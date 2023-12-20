@@ -1,10 +1,22 @@
 import { Router } from 'express';
 import { UserRouters } from '../modules/user/user.route';
+import { AcademicSemesterRouters } from '../modules/academicSemester/academicSemester.route';
 const router = Router();
-const moduleRoutes = [
+
+type TModuleRoute = {
+  path: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  route: any;
+};
+
+const moduleRoutes: TModuleRoute[] = [
   {
-    path: '/user',
+    path: '/users',
     route: UserRouters,
+  },
+  {
+    path: '/academic-semester',
+    route: AcademicSemesterRouters,
   },
 ];
 
