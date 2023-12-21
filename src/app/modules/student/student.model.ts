@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import {
   TGuardian,
   TLocalGuardian,
@@ -6,6 +6,7 @@ import {
   TStudentName,
 } from './student.interface';
 import User from '../user/user.model';
+import AcademicSemester from '../academicSemester/academicSemester.model';
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -125,6 +126,10 @@ const studentSchema = new Schema<TStudent>(
     },
     profileImage: {
       type: String,
+    },
+    academicSemester: {
+      type: Types.ObjectId,
+      ref: AcademicSemester,
     },
   },
   { timestamps: true }
