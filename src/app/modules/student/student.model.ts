@@ -6,7 +6,6 @@ import {
   TStudentName,
 } from './student.interface';
 import User from '../user/user.model';
-import AcademicSemester from '../academicSemester/academicSemester.model';
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -90,6 +89,11 @@ const studentSchema = new Schema<TStudent>(
       type: studentNameSchema,
       required: [true, 'Name is required'],
     },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+    },
     gender: {
       type: String,
       enum: ['Male', 'Female', 'Other'],
@@ -127,9 +131,9 @@ const studentSchema = new Schema<TStudent>(
     profileImage: {
       type: String,
     },
-    academicSemester: {
+    admissionSemester: {
       type: Types.ObjectId,
-      ref: AcademicSemester,
+      ref: 'AcademicSemester',
     },
   },
   { timestamps: true }
