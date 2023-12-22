@@ -24,7 +24,7 @@ const createStudent = async (password: string, payload: TStudent) => {
   user.id = await generateStudentId(academicSemester);
 
   //create user
-  const newUser = await User.create(user);
+  const newUser = await User.create(user); // NEED TO FIX: if I send duplicate email student does not crating but user is creating
 
   //create student
   if (Object.keys(newUser).length) {
