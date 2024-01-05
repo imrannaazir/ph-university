@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 const globalErrorHandler = (
   error: any,
@@ -9,8 +10,13 @@ const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const statusCode = 500;
-  const errorMessage = error.message || 'Something went wrong!';
+  let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+  let message = 'Internal server error';
+  let errorMessage = 'Something went wrong!';
+
+  // handle duplicate key error.
+  if (error.code === 1100) {
+  }
 
   return res.status(statusCode).json({
     success: false,

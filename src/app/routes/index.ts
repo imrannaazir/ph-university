@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { UserRouters } from '../modules/user/user.route';
 import { AcademicSemesterRouters } from '../modules/academicSemester/academicSemester.route';
 import AcademicFacultyRoutes from '../modules/academicFaculty/academicFaculty.route';
+import AcademicDepartmentRoutes from '../modules/academicDepartment/academicDepartment.route';
 const router = Router();
 
 type TModuleRoute = {
@@ -22,6 +23,10 @@ const moduleRoutes: TModuleRoute[] = [
   {
     path: '/academic-faculties',
     route: AcademicFacultyRoutes,
+  },
+  {
+    path: '/academic-department',
+    route: AcademicDepartmentRoutes,
   },
 ];
 
