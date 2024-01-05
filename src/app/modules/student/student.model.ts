@@ -1,11 +1,10 @@
-import { Schema, Types, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import {
   TGuardian,
   TLocalGuardian,
   TStudent,
   TStudentName,
 } from './student.interface';
-import User from '../user/user.model';
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -83,7 +82,7 @@ const studentSchema = new Schema<TStudent>(
       type: Schema.Types.ObjectId,
       required: [true, 'user id is required'],
       unique: true,
-      ref: User,
+      ref: 'User',
     },
     name: {
       type: studentNameSchema,
@@ -132,8 +131,12 @@ const studentSchema = new Schema<TStudent>(
       type: String,
     },
     admissionSemester: {
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'AcademicSemester',
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
     },
   },
   { timestamps: true }
