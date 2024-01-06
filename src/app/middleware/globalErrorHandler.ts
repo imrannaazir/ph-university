@@ -9,6 +9,8 @@ import config from '../config';
 import handleMongooseValidationError from '../errors/handleMongooseValidationError';
 import handleDuplicateKeyError from '../errors/handleDuplicateKeyError';
 import handleCastError from '../errors/handleCastError';
+import AppError from '../errors/AppError';
+import handleAppError from '../errors/handleAppError';
 
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -46,12 +48,19 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
+
+  // handle custom AppError
+  else if (error instanceof AppError) {
+    const simplifiedError = handleAppError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
   return res.status(statusCode).json({
     success: false,
     message,
     errorSources,
     stack: config.NODE_ENV === 'development' ? error?.stack : null,
-    error,
   });
 };
 
