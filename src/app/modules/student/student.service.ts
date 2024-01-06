@@ -33,6 +33,11 @@ const getSingleStudent = async (id: string) => {
 
 // update student by Id
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
+  const { name, guardian, localGuardian, ...remainingData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = { ...remainingData };
+
+  // check student exist
   const isStudentExist = await Student.findOne({ id });
   if (!isStudentExist) {
     throw new AppError(
@@ -41,7 +46,28 @@ const updateStudent = async (id: string, payload: Partial<TStudent>) => {
     );
   }
 
-  const result = await Student.findOneAndUpdate({ id }, payload, {
+  // if name value sent from client
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  // if guardian sent from client
+  if (guardian && Object.keys(guardian).length) {
+    for (const [key, value] of Object.entries(guardian)) {
+      modifiedUpdatedData[`guardian.${key}`] = value;
+    }
+  }
+
+  // if local guardian sent from client
+  if (localGuardian && Object.keys(localGuardian).length) {
+    for (const [key, value] of Object.entries(localGuardian)) {
+      modifiedUpdatedData[`localGuardian.${key}`] = value;
+    }
+  }
+
+  const result = await Student.findOneAndUpdate({ id }, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });

@@ -70,23 +70,20 @@ export const updateStudentLocalGuardianValidationSchema = z.object({
 
 export const updateStudentValidationSchema = z.object({
   body: z.object({
-    password: z.string().optional(),
-    student: z.object({
-      name: updateStudentNameValidationSchema.optional(),
-      email: z.string().email().optional(),
-      gender: z.enum(['Male', 'Female', 'Other']).optional(),
-      dateOfBirth: z.string().optional(),
-      contactNo: z.string().optional(),
-      emergencyContact: z.string().optional(),
-      presentAddress: z.string().optional(),
-      permanentAddress: z.string().optional(),
-      guardian: updateStudentGuardianValidationSchema.optional(),
-      localGuardian: updateStudentLocalGuardianValidationSchema
-        .optional()
-        .optional(),
-      profileImage: z.string().optional(),
-      admissionSemester: z.string().optional(),
-      academicDepartment: z.string().optional(),
-    }),
+    name: updateStudentNameValidationSchema.optional(),
+    email: z.string().email().optional(),
+    gender: z.enum(['Male', 'Female', 'Other']).optional(),
+    dateOfBirth: z.string().optional(),
+    contactNo: z.string().optional(),
+    emergencyContact: z.string().optional(),
+    presentAddress: z.string().optional(),
+    permanentAddress: z.string().optional(),
+    guardian: updateStudentGuardianValidationSchema.optional(),
+    localGuardian: updateStudentLocalGuardianValidationSchema
+      .optional()
+      .optional(),
+    profileImage: z.string().optional(),
+    admissionSemester: z.string().optional(),
+    academicDepartment: z.string().optional(),
   }),
 });
