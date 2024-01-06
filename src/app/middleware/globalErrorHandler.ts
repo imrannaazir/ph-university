@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 import handleZodError from '../errors/handleZodError';
 import config from '../config';
+import handleMongooseValidationError from '../errors/handleMongooseValidationError';
 
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -20,11 +21,20 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     errorSources = simplifiedError.errorSources;
   }
 
+  // handle mongoose validation error
+  else if (error.name === 'ValidationError') {
+    const simplifiedError = handleMongooseValidationError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
+
   return res.status(statusCode).json({
     success: false,
     message,
     errorSources,
     stack: config.NODE_ENV === 'development' ? error?.stack : null,
+    error,
   });
 };
 
