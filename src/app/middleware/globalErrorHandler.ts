@@ -1,27 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
-import { NextFunction, Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
 
-const globalErrorHandler = (
-  error: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+import { ErrorRequestHandler } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { ZodError } from 'zod';
+import handleZodError from '../errors/handleZodError';
+import config from '../config';
+
+const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
   let message = 'Internal server error';
-  let errorMessage = error.message || 'Something went wrong!';
+  let errorSources = null;
 
   // handle duplicate key error.
-  if (error.code === 1100) {
+  if (error instanceof ZodError) {
+    const simplifiedError = handleZodError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
   }
 
   return res.status(statusCode).json({
     success: false,
-    message: errorMessage,
-    error,
+    message,
+    errorSources,
+    stack: config.NODE_ENV === 'development' ? error?.stack : null,
   });
 };
 
