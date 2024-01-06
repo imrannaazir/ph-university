@@ -9,15 +9,25 @@ import User from '../user/user.model';
 const getAllStudents = async () => {
   const result = await Student.find({})
     .populate('admissionSemester')
-    .populate('academicDepartment');
+    .populate({
+      path: 'academicDepartment',
+      populate: {
+        path: 'academicFaculty',
+      },
+    });
   return result;
 };
 
 // get single student by Id
 const getSingleStudent = async (id: string) => {
-  const result = await Student.findOne({ id })
+  const result = await Student.findOne({ id: id })
     .populate('admissionSemester')
-    .populate('academicDepartment');
+    .populate({
+      path: 'academicDepartment',
+      populate: {
+        path: 'academicFaculty',
+      },
+    });
   return result;
 };
 
@@ -50,7 +60,7 @@ const deleteStudentById = async (id: string) => {
   const session = await mongoose.startSession();
 
   try {
-    await session.startTransaction();
+    session.startTransaction();
 
     // delete user : Transaction 1
     const user = await User.findOneAndUpdate(
@@ -59,7 +69,7 @@ const deleteStudentById = async (id: string) => {
       { session }
     );
 
-    if (user?.isDeleted !== true) {
+    if (!user) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to delete user.');
     }
 
@@ -70,7 +80,7 @@ const deleteStudentById = async (id: string) => {
       { session }
     );
 
-    if (!student?.isDeleted === true) {
+    if (!student) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to delete student.');
     }
     await session.commitTransaction();

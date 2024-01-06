@@ -3,6 +3,7 @@ import { UserRouters } from '../modules/user/user.route';
 import { AcademicSemesterRouters } from '../modules/academicSemester/academicSemester.route';
 import AcademicFacultyRoutes from '../modules/academicFaculty/academicFaculty.route';
 import AcademicDepartmentRoutes from '../modules/academicDepartment/academicDepartment.route';
+import StudentRoutes from '../modules/student/student.route';
 const router = Router();
 
 type TModuleRoute = {
@@ -15,6 +16,10 @@ const moduleRoutes: TModuleRoute[] = [
   {
     path: '/users',
     route: UserRouters,
+  },
+  {
+    path: '/students',
+    route: StudentRoutes,
   },
   {
     path: '/academic-semester',
