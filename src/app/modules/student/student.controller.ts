@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 
 // get all students
 const getAllStudents = catchAsync(async (req: Request, res: Response) => {
-  const result = await StudentService.getAllStudents();
+  const result = await StudentService.getAllStudents(req.query);
 
   sendResponse(res, {
     success: true,
