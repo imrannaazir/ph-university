@@ -12,7 +12,7 @@ const globalErrorHandler = (
 ) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
   let message = 'Internal server error';
-  let errorMessage = 'Something went wrong!';
+  let errorMessage = error.message || 'Something went wrong!';
 
   // handle duplicate key error.
   if (error.code === 1100) {
