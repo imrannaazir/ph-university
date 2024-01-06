@@ -8,6 +8,7 @@ import handleZodError from '../errors/handleZodError';
 import config from '../config';
 import handleMongooseValidationError from '../errors/handleMongooseValidationError';
 import handleDuplicateKeyError from '../errors/handleDuplicateKeyError';
+import handleCastError from '../errors/handleCastError';
 
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -38,6 +39,13 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     errorSources = simplifiedError.errorSources;
   }
 
+  // handle cast error
+  else if (error.name === 'CastError') {
+    const simplifiedError = handleCastError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
   return res.status(statusCode).json({
     success: false,
     message,
