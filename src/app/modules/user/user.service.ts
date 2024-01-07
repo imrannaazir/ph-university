@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StatusCodes } from 'http-status-codes';
 import config from '../../config';
 import AppError from '../../errors/AppError';
@@ -9,6 +10,9 @@ import { TUser } from './user.interface';
 import User from './user.model';
 import AcademicDepartment from '../academicDepartment/academicDepartment.model';
 import mongoose from 'mongoose';
+import { TFaculty } from '../faculty/faculty.interface';
+import { generateFacultyId } from '../faculty/faculty.utils';
+import Faculty from '../faculty/faculty.model';
 
 const createStudent = async (password: string, payload: TStudent) => {
   const user: TUser = {
@@ -18,8 +22,6 @@ const createStudent = async (password: string, payload: TStudent) => {
   };
 
   user.password = password ? password : config.default_password;
-
-  user.role = 'student';
 
   const academicSemester = await AcademicSemester.findById(
     payload.admissionSemester
@@ -98,6 +100,61 @@ const createStudent = async (password: string, payload: TStudent) => {
   }
 };
 
+// create faculty
+const createFaculty = async (password: string, payload: TFaculty) => {
+  const user: TUser = {
+    id: '',
+    role: 'faculty',
+    password: password ? password : config.default_password,
+  };
+  user.id = await generateFacultyId();
+
+  const session = await mongoose.startSession();
+
+  try {
+    //start transaction
+    session.startTransaction();
+
+    // create user user : Transaction 1
+    const newUser = await User.create([user], { session });
+
+    // check user created
+    if (!Object.keys(newUser[0]).length) {
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    // check academicDepartment exist
+    const isAcademicDepartmentExist = await AcademicDepartment.findById(
+      payload.academicDepartment
+    );
+    if (!isAcademicDepartmentExist?._id) {
+      throw new AppError(
+        StatusCodes.NOT_FOUND,
+        `Academic not founded by Id : ${payload.academicDepartment}`
+      );
+    }
+
+    // create faculty
+    const newFaculty = await Faculty.create([payload], { session });
+    //check faculty created
+    if (!Object.keys(newFaculty).length) {
+      throw new AppError(StatusCodes.BAD_GATEWAY, 'Failed to create faculty.');
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+    return newFaculty[0];
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
 export const UserService = {
   createStudent,
+  createFaculty,
 };

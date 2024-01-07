@@ -45,5 +45,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// hide password
+userSchema.post('save', async function (doc, next) {
+  doc.set('password', undefined);
+  next();
+});
+
 const User = model('user', userSchema);
 export default User;
