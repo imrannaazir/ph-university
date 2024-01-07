@@ -17,7 +17,7 @@ export type TBloodGroup =
   | 'O-';
 
 export type TAdmin = {
-  id: string;
+  id?: string;
   user: Types.ObjectId;
   name: TAdminName;
   gender: TGender;

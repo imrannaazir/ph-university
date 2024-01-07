@@ -13,6 +13,9 @@ import mongoose from 'mongoose';
 import { TFaculty } from '../faculty/faculty.interface';
 import { generateFacultyId } from '../faculty/faculty.utils';
 import Faculty from '../faculty/faculty.model';
+import { TAdmin } from '../admin/admin.interface';
+import generateAdminId from '../admin/admin.utils';
+import Admin from '../admin/admin.model';
 
 const createStudent = async (password: string, payload: TStudent) => {
   const user: TUser = {
@@ -164,7 +167,61 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   }
 };
 
+// create admin
+const createAdmin = async (password: string, payload: TAdmin) => {
+  const user: TUser = {
+    id: '',
+    role: 'admin',
+    password: password ? password : config.default_password,
+  };
+
+  // set user ID
+  user.id = await generateAdminId();
+
+  // check email exist
+  const isEmailExist = await Admin.findOne({ email: payload.email });
+  if (isEmailExist?._id)
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `Admin already exit with email : ${payload.email}`
+    );
+
+  // create session
+  const session = await mongoose.startSession();
+
+  try {
+    // start transaction
+    session.startTransaction();
+
+    // create admin :Transaction 1
+    const newUser = await User.create([user], { session });
+
+    //check if user created
+    if (!newUser[0]._id)
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user.');
+
+    //insert userId and Id
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    // create admin :Transaction 2
+    const newAdmin = await Admin.create([payload], { session });
+
+    // check admin created
+    if (!newAdmin[0]._id)
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create admin.');
+
+    await session.commitTransaction();
+    session.endSession();
+    return newAdmin[0];
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new AppError(StatusCodes.BAD_REQUEST, error.message);
+  }
+};
 export const UserService = {
   createStudent,
   createFaculty,
+  createAdmin,
 };

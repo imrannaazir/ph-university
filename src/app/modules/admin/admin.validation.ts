@@ -11,7 +11,7 @@ export const createAdminValidationSchema = z.object({
   body: z.object({
     password: z.string().optional(),
     admin: z.object({
-      id: z.string(),
+      id: z.string().optional(),
       email: z.string().email(),
       name: crateAdminNameValidationSchema,
       bloodGroup: z.enum([...BloodGroups] as [string, ...string[]]),
