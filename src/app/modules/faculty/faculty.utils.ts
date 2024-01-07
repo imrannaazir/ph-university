@@ -18,7 +18,7 @@ export const generateFacultyId = async () => {
     incrementedFacultyCode.toString().padStart(4, '0') ||
     (0).toString().padStart(4, '0');
 
-  const nextFacultyId = `A-${nextFacultyCode}`;
+  const nextFacultyId = `F-${nextFacultyCode}`;
 
   return nextFacultyId;
 };

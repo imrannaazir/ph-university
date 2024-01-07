@@ -126,6 +126,16 @@ const createFaculty = async (password: string, payload: TFaculty) => {
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
 
+    //check if faculty already exit by email
+    const isEmailExist = await Faculty.findOne({ email: payload?.email });
+
+    if (isEmailExist) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        `Faculty already exist by email ${payload.email}`
+      );
+    }
+
     // check academicDepartment exist
     const isAcademicDepartmentExist = await AcademicDepartment.findById(
       payload.academicDepartment

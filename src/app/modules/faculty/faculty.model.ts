@@ -35,6 +35,11 @@ const facultySchema = new Schema<TFaculty>(
       required: true,
       ref: 'User',
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     academicDepartment: {
       type: Schema.Types.ObjectId,
       ref: 'academicDepartment',

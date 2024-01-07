@@ -16,6 +16,7 @@ export const createFacultyValidationSchema = z.object({
       contactNo: z.string(),
       academicDepartment: z.string(),
       designation: z.string(),
+      email: z.string(),
       isDeleted: z.boolean(),
       permanentAddress: z.string(),
       presentAddress: z.string(),
