@@ -5,6 +5,7 @@ import AcademicFacultyRoutes from '../modules/academicFaculty/academicFaculty.ro
 import AcademicDepartmentRoutes from '../modules/academicDepartment/academicDepartment.route';
 import StudentRoutes from '../modules/student/student.route';
 import FacultyRoutes from '../modules/faculty/faculty.route';
+import AdminRoutes from '../modules/admin/admin.route';
 const router = Router();
 
 type TModuleRoute = {
@@ -37,6 +38,10 @@ const moduleRoutes: TModuleRoute[] = [
   {
     path: '/faculties',
     route: FacultyRoutes,
+  },
+  {
+    path: '/admins',
+    route: AdminRoutes,
   },
 ];
 
