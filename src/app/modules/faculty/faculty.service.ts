@@ -26,6 +26,9 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
     .paginate();
 
   const result = await facultiesQuery.modelQuery;
+
+  if (!result.length)
+    throw new AppError(StatusCodes.NOT_FOUND, 'No results founded.');
   return result;
 };
 
@@ -38,6 +41,11 @@ const getSingleFaculty = async (id: string) => {
     },
   });
 
+  if (!result?._id)
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      `Faculty not founded by id:${id}`
+    );
   return result;
 };
 

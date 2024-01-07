@@ -21,7 +21,7 @@ const academicDepartmentSchema = new Schema<TAcademicDepartment>(
 );
 
 const AcademicDepartment = model<TAcademicDepartment>(
-  'AcademicDepartment',
+  'academicDepartment',
   academicDepartmentSchema
 );
 export default AcademicDepartment;

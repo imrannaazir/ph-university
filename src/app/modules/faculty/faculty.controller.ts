@@ -30,10 +30,10 @@ const getSingleFaculty = catchAsync(async (req, res) => {
 
 // update faculty by Id
 const updateFacultyById = catchAsync(async (req, res) => {
-  const query = req.query;
+  const payload = req.body;
   const { id } = req.params;
 
-  const result = await FacultyService.updateFacultyById(id, query);
+  const result = await FacultyService.updateFacultyById(id, payload);
 
   sendResponse(res, {
     success: true,
