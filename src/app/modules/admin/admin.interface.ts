@@ -20,7 +20,6 @@ export type TAdmin = {
   id: string;
   user: Types.ObjectId;
   name: TAdminName;
-  designation: string;
   gender: TGender;
   email: string;
   dateOfBirth?: Date;
