@@ -28,6 +28,9 @@ const getAllCourse = async (query: Record<string, unknown>) => {
 
   const result = await courseQuery.modelQuery;
 
+  if (!result.length)
+    throw new AppError(StatusCodes.NOT_FOUND, 'No courses founded.');
+
   return result;
 };
 
@@ -36,6 +39,9 @@ const getSingleCourse = async (id: string) => {
   const result = await Course.findById(id).populate(
     'preRequisiteCourses.course'
   );
+
+  if (!result?._id)
+    throw new AppError(StatusCodes.NOT_FOUND, `Course not founded by Id:${id}`);
   return result;
 };
 
