@@ -15,3 +15,14 @@ export const createCourseValidationSchema = z.object({
     preRequisites: z.array(preRequisiteValidationSchema).optional(),
   }),
 });
+
+export const updateCourseValidationSchema = z.object({
+  body: z.object({
+    title: z.string().trim().optional(),
+    prefix: z.string().trim().optional(),
+    code: z.number().optional(),
+    credits: z.number().optional(),
+    isDeleted: z.boolean().optional(),
+    preRequisites: z.array(preRequisiteValidationSchema).optional(),
+  }),
+});
