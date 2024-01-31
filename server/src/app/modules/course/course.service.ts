@@ -17,7 +17,7 @@ const createCourse = async (payload: TCourse) => {
 // get all course
 const getAllCourse = async (query: Record<string, unknown>) => {
   const courseQuery = new QueryBuilder(
-    Course.find().populate('preRequisiteCourses.course'),
+    Course.find().populate('preRequisites.course'),
     query
   )
     .search(CourseSearchableFields)
@@ -36,9 +36,7 @@ const getAllCourse = async (query: Record<string, unknown>) => {
 
 // get single course by Id
 const getSingleCourse = async (id: string) => {
-  const result = await Course.findById(id).populate(
-    'preRequisiteCourses.course'
-  );
+  const result = await Course.findById(id).populate('preRequisites.course');
 
   if (!result?._id)
     throw new AppError(StatusCodes.NOT_FOUND, `Course not founded by Id:${id}`);
@@ -72,6 +70,8 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
         remainingData,
         { session, new: true, runValidators: true }
       );
+
+      // console.log(updatedPrimitiveCourseData);
 
       if (!updatedPrimitiveCourseData)
         throw new AppError(
@@ -132,10 +132,12 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
       }
 
       await session.commitTransaction();
-      session.endSession();
+      await session.endSession();
 
-      const updatedCourse = await Course.findById(id);
-      return updatedCourse;
+      const result = await Course.findById(id);
+      console.log(result, '🤣');
+
+      return result;
     }
   } catch (error: any) {
     await session.abortTransaction();
