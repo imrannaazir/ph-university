@@ -1,11 +1,10 @@
 import React from "react";
-import { Layout, Menu, MenuProps } from "antd";
+import { Layout, Menu } from "antd";
 import { Outlet } from "react-router-dom";
-import { adminSidebarItems } from "../../routes/admin.routes";
+import sidebarItemsGenerator from "../../libs/sidebarItemsGenerator";
+import { adminPaths } from "../../routes/admin.routes";
 
-const { Header, Content, Footer, Sider } = Layout;
-
-const items: MenuProps["items"] = adminSidebarItems;
+const { Header, Content, Sider } = Layout;
 
 const MainLayout: React.FC = () => {
   return (
@@ -35,7 +34,7 @@ const MainLayout: React.FC = () => {
           theme="dark"
           mode="inline"
           defaultSelectedKeys={["4"]}
-          items={items}
+          items={sidebarItemsGenerator(adminPaths)}
         />
       </Sider>
       <Layout>
@@ -43,9 +42,6 @@ const MainLayout: React.FC = () => {
         <Content style={{ margin: "24px 16px 0" }}>
           <Outlet />
         </Content>
-        <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );
