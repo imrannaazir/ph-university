@@ -63,82 +63,74 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
     session.startTransaction();
 
     // update primitive values
-    if (Object.keys(remainingData).length) {
-      // transaction 1
-      const updatedPrimitiveCourseData = await Course.findByIdAndUpdate(
-        id,
-        remainingData,
-        { session, new: true, runValidators: true }
+
+    // transaction 1
+    const updatedPrimitiveCourseData = await Course.findByIdAndUpdate(
+      id,
+      remainingData,
+      { new: true, runValidators: true, session }
+    );
+
+    if (!updatedPrimitiveCourseData)
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        'Failed to update primitive values of  course. '
       );
 
-      // console.log(updatedPrimitiveCourseData);
-
-      if (!updatedPrimitiveCourseData)
-        throw new AppError(
-          StatusCodes.BAD_REQUEST,
-          'Failed to update primitive values of  course. '
-        );
-    }
-
     // if payload carries prerequisites
-    if (preRequisites && preRequisites.length) {
+    if (preRequisites && preRequisites.length > 0) {
       const preRequisitesToDelete = preRequisites
-        .filter((elm) => elm.isDeleted)
+        .filter((elm) => elm.course && elm.isDeleted)
         .map((elm) => elm.course);
 
       // delete pre requisite course from course
-      if (preRequisitesToDelete.length) {
-        // transaction 2
-        const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
-          id,
-          {
-            $pull: {
-              preRequisites: { course: { $in: preRequisitesToDelete } },
-            },
+      // transaction 2
+      const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $pull: {
+            preRequisites: { course: { $in: preRequisitesToDelete } },
           },
-          { session, new: true, runValidators: true }
-        );
-
-        if (!deletedPreRequisiteCourses)
-          throw new AppError(
-            StatusCodes.BAD_REQUEST,
-            `Failed to remove preRequisite courses from Course.`
-          );
-      }
-
-      const preRequisiteCoursesToAdd = preRequisites.filter(
-        (elm) => !elm.isDeleted
+        },
+        { new: true, runValidators: true, session }
       );
 
-      if (preRequisiteCoursesToAdd.length) {
-        // transaction 3
-        const preRequisiteAddedCourse = await Course.findByIdAndUpdate(
-          id,
-          {
-            $addToSet: {
-              preRequisites: {
-                $each: preRequisiteCoursesToAdd,
-              },
-            },
-          },
-          { session, new: true, runValidators: true }
+      if (!deletedPreRequisiteCourses)
+        throw new AppError(
+          StatusCodes.BAD_REQUEST,
+          `Failed to remove preRequisite courses from Course.`
         );
 
-        if (!preRequisiteAddedCourse)
-          throw new AppError(
-            StatusCodes.BAD_REQUEST,
-            'Failed to add pre requisites to course.'
-          );
-      }
+      const preRequisiteCoursesToAdd = preRequisites.filter(
+        (elm) => elm.course && !elm.isDeleted
+      );
 
-      await session.commitTransaction();
-      await session.endSession();
+      // transaction 3
+      const preRequisiteAddedCourse = await Course.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            preRequisites: {
+              $each: preRequisiteCoursesToAdd,
+            },
+          },
+        },
+        { new: true, runValidators: true, session }
+      );
 
-      const result = await Course.findById(id);
-      console.log(result, '🤣');
-
-      return result;
+      if (!preRequisiteAddedCourse)
+        throw new AppError(
+          StatusCodes.BAD_REQUEST,
+          'Failed to add pre requisites to course.'
+        );
     }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    const result = await Course.findById(id);
+
+    return result;
   } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
