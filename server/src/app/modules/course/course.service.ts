@@ -167,6 +167,7 @@ const deleteCourseById = async (id: string) => {
   };
 };
 
+// assign faculties on course
 const assignFacultiesOnCourse = async (
   id: string,
   payload: TCourseFaculties
@@ -187,6 +188,22 @@ const assignFacultiesOnCourse = async (
   return courseFaculties;
 };
 
+// remove faculties from course
+const removeFacultiesFromCourse = async (
+  id: string,
+  payload: TCourseFaculties
+) => {
+  const result = await CourseFaculties.findByIdAndUpdate(
+    id,
+    {
+      $pull: { faculties: { $in: payload } },
+    },
+    { new: true }
+  );
+
+  return result;
+};
+
 const CourseService = {
   createCourse,
   getAllCourse,
@@ -194,5 +211,6 @@ const CourseService = {
   updateCourseById,
   deleteCourseById,
   assignFacultiesOnCourse,
+  removeFacultiesFromCourse,
 };
 export default CourseService;
