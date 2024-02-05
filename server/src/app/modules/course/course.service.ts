@@ -3,8 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import { CourseSearchableFields } from './course.constant';
-import { TCourse } from './course.interface';
-import Course from './course.model';
+import { TCourse, TCourseFaculties } from './course.interface';
+import Course, { CourseFaculties } from './course.model';
 import mongoose from 'mongoose';
 import config from '../../config';
 
@@ -167,11 +167,32 @@ const deleteCourseById = async (id: string) => {
   };
 };
 
+const assignFacultiesOnCourse = async (
+  id: string,
+  payload: TCourseFaculties
+) => {
+  const courseFaculties = await CourseFaculties.findByIdAndUpdate(
+    id,
+    {
+      course: id,
+      $addToSet: {
+        faculties: { $each: payload },
+      },
+    },
+    {
+      upsert: true,
+      new: true,
+    }
+  );
+  return courseFaculties;
+};
+
 const CourseService = {
   createCourse,
   getAllCourse,
   getSingleCourse,
   updateCourseById,
   deleteCourseById,
+  assignFacultiesOnCourse,
 };
 export default CourseService;
