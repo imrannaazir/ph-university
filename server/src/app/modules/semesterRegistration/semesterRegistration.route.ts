@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import validateRequest from '../../middleware/validateRequest';
-import { semesterRegistrationValidationSchema } from './semesterRegistration.validation';
+import {
+  semesterRegistrationValidationSchema,
+  updateSemesterRegistrationValidationSchema,
+} from './semesterRegistration.validation';
 import SemesterRegistrationController from './semesterRegistration.controller';
 
 const router = Router();
@@ -19,6 +22,13 @@ router.get('/', SemesterRegistrationController.getAllSemesterRegistration);
 router.get(
   '/:id',
   SemesterRegistrationController.getSingleSemesterRegistration
+);
+
+// update single semester registration by Id: PATCH
+router.patch(
+  '/:id',
+  validateRequest(updateSemesterRegistrationValidationSchema),
+  SemesterRegistrationController.updateSemesterRegistration
 );
 const SemesterRegistrationRoutes = router;
 export default SemesterRegistrationRoutes;

@@ -19,7 +19,7 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
     await SemesterRegistration.findOne({
       $or: [
         {
-          status: SemesterStatus.INCOMING,
+          status: SemesterStatus.UPCOMING,
         },
         {
           status: SemesterStatus.ONGOING,
@@ -86,9 +86,84 @@ const getSingleSemesterRegistration = async (id: string) => {
   const result = await SemesterRegistration.findById(id);
   return result;
 };
+
+// update semester registration
+const updateSemesterRegistration = async (
+  id: string,
+  payload: Partial<TSemesterRegistration>
+) => {
+  /* 
+1. check if academic semester is exist
+2. Check if semester registration that need to update is exist
+3. If status is 'ENDED' do nothing
+4. If status is 'ONGOING' update only status
+5. If status is 'UPCOMING' update all
+*/
+
+  // check semester registration existence
+  const isSemesterRegistrationExist = await SemesterRegistration.findById(id);
+
+  if (!isSemesterRegistrationExist?._id)
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      `Semester registration not founded by Id: ${id}`
+    );
+
+  const semesterRegisterStatus = isSemesterRegistrationExist.status;
+
+  // if status is ENDED
+  if (semesterRegisterStatus === SemesterStatus.ENDED)
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `You can not update ${semesterRegisterStatus} semester registration.`
+    );
+
+  // if try to update status from UPCOMING to ENDED
+  console.log(
+    semesterRegisterStatus === SemesterStatus.UPCOMING &&
+      payload.status === SemesterStatus.ENDED
+  );
+
+  if (
+    semesterRegisterStatus === SemesterStatus.UPCOMING &&
+    payload.status === SemesterStatus.ENDED
+  )
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `You can not update status from ${semesterRegisterStatus} to ${payload.status}`
+    );
+
+  // if status is ONGOING
+
+  // console.log(semesterRegisterStatus === SemesterStatus.ONGOING);
+  if (semesterRegisterStatus === SemesterStatus.ONGOING) {
+    if (payload.status === SemesterStatus.UPCOMING)
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        `You can not update status from ${semesterRegisterStatus} to ${payload.status}`
+      );
+
+    const result = await SemesterRegistration.findByIdAndUpdate(
+      id,
+      { status: payload.status },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    return result;
+  }
+
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
 const SemesterRegistrationService = {
   createSemesterRegistration,
   getAllSemesterRegistration,
   getSingleSemesterRegistration,
+  updateSemesterRegistration,
 };
 export default SemesterRegistrationService;
