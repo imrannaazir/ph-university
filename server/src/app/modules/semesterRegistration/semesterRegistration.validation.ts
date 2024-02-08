@@ -5,9 +5,9 @@ export const semesterRegistrationValidationSchema = z.object({
   body: z.object({
     academicSemester: z.string(),
     status: z.enum(SemesterRegistrationStatus as [string, ...string[]]),
-    startDate: z.date(),
-    endDate: z.date(),
-    minCredit: z.number(),
-    maxCredit: z.number(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+    minCredit: z.number().optional(),
+    maxCredit: z.number().optional(),
   }),
 });

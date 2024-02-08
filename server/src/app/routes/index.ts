@@ -7,6 +7,7 @@ import StudentRoutes from '../modules/student/student.route';
 import FacultyRoutes from '../modules/faculty/faculty.route';
 import AdminRoutes from '../modules/admin/admin.route';
 import CourseRoutes from '../modules/course/course.route';
+import SemesterRegistrationRoutes from '../modules/semesterRegistration/semesterRegistration.route';
 const router = Router();
 
 type TModuleRoute = {
@@ -47,6 +48,10 @@ const moduleRoutes: TModuleRoute[] = [
   {
     path: '/courses',
     route: CourseRoutes,
+  },
+  {
+    path: '/semester-registration',
+    route: SemesterRegistrationRoutes,
   },
 ];
 
