@@ -30,5 +30,11 @@ router.patch(
   validateRequest(updateSemesterRegistrationValidationSchema),
   SemesterRegistrationController.updateSemesterRegistration
 );
+
+// delete semester registration by id :DELETE
+router.delete(
+  '/:id',
+  SemesterRegistrationController.deleteSemesterRegistration
+);
 const SemesterRegistrationRoutes = router;
 export default SemesterRegistrationRoutes;

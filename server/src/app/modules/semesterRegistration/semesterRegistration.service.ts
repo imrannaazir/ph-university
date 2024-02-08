@@ -119,10 +119,6 @@ const updateSemesterRegistration = async (
     );
 
   // if try to update status from UPCOMING to ENDED
-  console.log(
-    semesterRegisterStatus === SemesterStatus.UPCOMING &&
-      payload.status === SemesterStatus.ENDED
-  );
 
   if (
     semesterRegisterStatus === SemesterStatus.UPCOMING &&
@@ -160,10 +156,24 @@ const updateSemesterRegistration = async (
   });
   return result;
 };
+
+// delete semester registration
+const deleteSemesterRegistration = async (id: string) => {
+  const isSemesterRegistrationExist = await SemesterRegistration.findById(id);
+  if (!isSemesterRegistrationExist?._id)
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      `Semester registration not founded by Id: ${id}`
+    );
+
+  const result = await SemesterRegistration.findByIdAndDelete(id);
+  return result;
+};
 const SemesterRegistrationService = {
   createSemesterRegistration,
   getAllSemesterRegistration,
   getSingleSemesterRegistration,
   updateSemesterRegistration,
+  deleteSemesterRegistration,
 };
 export default SemesterRegistrationService;
