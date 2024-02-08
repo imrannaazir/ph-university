@@ -4,6 +4,7 @@ import { SemesterStatus } from './semesterRegistration.constant';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import SemesterRegistration from './semesterRegistration.model';
 import AcademicSemester from '../academicSemester/academicSemester.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // create semester registration
 const createSemesterRegistration = async (payload: TSemesterRegistration) => {
@@ -58,7 +59,36 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
   return result;
 };
 
+// get all semester registration
+const getAllSemesterRegistration = async (query: Record<string, unknown>) => {
+  const semesterRegistrationQuery = new QueryBuilder(
+    SemesterRegistration.find().populate('academicSemester'),
+    query
+  )
+    .filters()
+    .sort()
+    .fields()
+    .paginate();
+
+  const result = await semesterRegistrationQuery.modelQuery;
+
+  if (result.length === 0)
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'No semester registration founded.'
+    );
+
+  return result;
+};
+
+// get single semester registration
+const getSingleSemesterRegistration = async (id: string) => {
+  const result = await SemesterRegistration.findById(id);
+  return result;
+};
 const SemesterRegistrationService = {
   createSemesterRegistration,
+  getAllSemesterRegistration,
+  getSingleSemesterRegistration,
 };
 export default SemesterRegistrationService;
