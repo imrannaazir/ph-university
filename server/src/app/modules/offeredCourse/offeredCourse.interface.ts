@@ -18,6 +18,12 @@ export type TOfferedCourse = {
   maxCapacity: number;
   section: number;
   days: TDays[];
-  startDate: string;
-  endDate: string;
+  startTime: string;
+  endTime: string;
+};
+
+export type TSchedule = {
+  days: TDays[];
+  startTime: string;
+  endTime: string;
 };

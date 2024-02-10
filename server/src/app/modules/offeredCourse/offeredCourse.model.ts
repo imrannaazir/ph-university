@@ -48,11 +48,11 @@ const offeredCourseSchema = new Schema<TOfferedCourse>(
         enum: Days,
       },
     ],
-    startDate: {
+    startTime: {
       type: String,
       required: true,
     },
-    endDate: {
+    endTime: {
       type: String,
       required: true,
     },

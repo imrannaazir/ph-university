@@ -7,3 +7,5 @@ export const Days = [
   'Saturday',
   'Sunday',
 ];
+
+export const StaticDate = `1970-01-01T`;
