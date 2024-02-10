@@ -5,6 +5,8 @@ import { TSemesterRegistration } from './semesterRegistration.interface';
 import SemesterRegistration from './semesterRegistration.model';
 import AcademicSemester from '../academicSemester/academicSemester.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import mongoose from 'mongoose';
+import OfferedCourse from '../offeredCourse/offeredCourse.model';
 
 // create semester registration
 const createSemesterRegistration = async (payload: TSemesterRegistration) => {
@@ -159,6 +161,10 @@ const updateSemesterRegistration = async (
 
 // delete semester registration
 const deleteSemesterRegistration = async (id: string) => {
+  /* 
+  1. delete associate offered course
+  2. delete semester registration when it is UPCOMING
+  */
   const isSemesterRegistrationExist = await SemesterRegistration.findById(id);
   if (!isSemesterRegistrationExist?._id)
     throw new AppError(
@@ -166,8 +172,49 @@ const deleteSemesterRegistration = async (id: string) => {
       `Semester registration not founded by Id: ${id}`
     );
 
-  const result = await SemesterRegistration.findByIdAndDelete(id);
-  return result;
+  if (isSemesterRegistrationExist.status !== 'UPCOMING') {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `You can not delete this semester registration as it is ${isSemesterRegistrationExist.status}.`
+    );
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // delete associated offered course
+    const deleteOfferedCourse = await OfferedCourse.deleteMany(
+      { semesterRegistration: id },
+      { session }
+    );
+
+    if (!deleteOfferedCourse) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        'Failed to delete semester registration.'
+      );
+    }
+
+    // delete semester registration
+    const result = await SemesterRegistration.findByIdAndDelete(id);
+    if (!result) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        'Failed to delete semester registration.'
+      );
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return `Deleted id: ${id}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, error);
+  }
 };
 const SemesterRegistrationService = {
   createSemesterRegistration,
