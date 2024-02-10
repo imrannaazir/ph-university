@@ -12,5 +12,10 @@ router.post(
   OfferedCourseController.createOfferedCourse
 );
 
+// get all offered course : GET
+router.get('/', OfferedCourseController.getAllOfferedCourse);
+
+// get single offered course by Id : GET
+router.get('/:id', OfferedCourseController.getSingleCourseById);
 const OfferedCourseRoutes = router;
 export default OfferedCourseRoutes;

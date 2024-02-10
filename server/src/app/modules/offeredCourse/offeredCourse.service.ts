@@ -8,6 +8,7 @@ import Course from '../course/course.model';
 import Faculty from '../faculty/faculty.model';
 import OfferedCourse from './offeredCourse.model';
 import { hasTimeConflict } from './offeredCourse.utils';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // create offered course
 const createOfferedCourse = async (payload: TOfferedCourse) => {
@@ -137,6 +138,32 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
   return result;
 };
 
-const OfferedCourseService = { createOfferedCourse };
+// get all offered course
+const getAllOfferedCourse = async (query: Record<string, unknown>) => {
+  const offeredCourseQuery = new QueryBuilder(OfferedCourse.find(), query)
+    .filters()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await offeredCourseQuery.modelQuery;
+  return result;
+};
+
+//get single offered course
+const getSingleOfferedCourse = async (id: string) => {
+  const result = await OfferedCourse.findById(id);
+  if (!result?._id) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.');
+  }
+
+  return result;
+};
+
+const OfferedCourseService = {
+  createOfferedCourse,
+  getAllOfferedCourse,
+  getSingleOfferedCourse,
+};
 
 export default OfferedCourseService;
