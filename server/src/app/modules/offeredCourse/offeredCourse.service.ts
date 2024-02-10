@@ -223,11 +223,40 @@ const updateOfferedCourseById = async (
   return result;
 };
 
+// delete offered course by Id
+const deleteOfferedCourseById = async (id: string) => {
+  /* 
+  1. check offered course existence
+  2. check if the status of semester registration is UPCOMING
+  3. delete
+  */
+
+  const isOfferedCourseExist = await OfferedCourse.findById(id);
+  if (!isOfferedCourseExist?._id) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.');
+  }
+
+  const semesterRegistration = await SemesterRegistration.findById(
+    isOfferedCourseExist.semesterRegistration
+  );
+
+  if (semesterRegistration?.status !== 'UPCOMING') {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `You can not update offered course as it is ${semesterRegistration?.status}`
+    );
+  }
+
+  const result = await OfferedCourse.findByIdAndDelete(id);
+  return result;
+};
+
 const OfferedCourseService = {
   createOfferedCourse,
   getAllOfferedCourse,
   getSingleOfferedCourse,
   updateOfferedCourseById,
+  deleteOfferedCourseById,
 };
 
 export default OfferedCourseService;
