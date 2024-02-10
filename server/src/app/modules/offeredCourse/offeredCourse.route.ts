@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import validateRequest from '../../middleware/validateRequest';
-import { createOfferedCourseValidationSchema } from './offeredCourse.validation';
+import {
+  createOfferedCourseValidationSchema,
+  updateOfferedCourseValidationSchema,
+} from './offeredCourse.validation';
 import OfferedCourseController from './offeredCourse.controller';
 
 const router = Router();
@@ -17,5 +20,12 @@ router.get('/', OfferedCourseController.getAllOfferedCourse);
 
 // get single offered course by Id : GET
 router.get('/:id', OfferedCourseController.getSingleCourseById);
+
+// update single offered course by Id : PATCH
+router.patch(
+  '/:id',
+  validateRequest(updateOfferedCourseValidationSchema),
+  OfferedCourseController.updateOfferedCourseById
+);
 const OfferedCourseRoutes = router;
 export default OfferedCourseRoutes;

@@ -160,10 +160,74 @@ const getSingleOfferedCourse = async (id: string) => {
   return result;
 };
 
+// update offered course by Id
+const updateOfferedCourseById = async (
+  id: string,
+  payload: Pick<TOfferedCourse, 'faculty' | 'days' | 'startTime' | 'endTime'>
+) => {
+  const { days, endTime, faculty, startTime } = payload;
+
+  /* 
+  1. check if offered course is exist
+  2. check if faculty is exist
+  3. check semester registration is UPCOMING
+  4. check time conflict for faculty
+  5. update offered course
+  */
+
+  const isOfferedCourseExist = await OfferedCourse.findById(id);
+  if (!isOfferedCourseExist?._id) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.');
+  }
+
+  // check faculty existence
+  const isFacultyExist = await Faculty.findById(faculty);
+  if (!isFacultyExist?._id) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not founded.');
+  }
+
+  const isSemesterRegistrationExist = await SemesterRegistration.findById(
+    isOfferedCourseExist.semesterRegistration
+  );
+
+  if (isSemesterRegistrationExist?.status !== 'UPCOMING') {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      `You can not update offered course as it is ${isSemesterRegistrationExist?.status}`
+    );
+  }
+
+  //check time conflict for faculty
+  const assignedSchedules = await OfferedCourse.find({
+    semesterRegistration: isSemesterRegistrationExist._id,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  if (hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      'This faculty is not available at this time. Please choose another days or time.'
+    );
+  }
+
+  const result = await OfferedCourse.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
 const OfferedCourseService = {
   createOfferedCourse,
   getAllOfferedCourse,
   getSingleOfferedCourse,
+  updateOfferedCourseById,
 };
 
 export default OfferedCourseService;

@@ -41,9 +41,27 @@ const getSingleCourseById = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// update offered course by Id
+const updateOfferedCourseById = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const payload = req.body;
+  const result = await OfferedCourseService.updateOfferedCourseById(
+    id,
+    payload
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Offered course updated successfully.',
+    data: result,
+  });
+});
 const OfferedCourseController = {
   createOfferedCourse,
   getAllOfferedCourse,
   getSingleCourseById,
+  updateOfferedCourseById,
 };
 export default OfferedCourseController;
