@@ -1,9 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import User from '../user/user.model';
-import { TLoginUser } from './auth.interface';
-import jwt from 'jsonwebtoken';
+import { TLoginUser, TPasswordData } from './auth.interface';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
+import bcrypt from 'bcrypt';
 
 // login user
 const loginUser = async (payload: TLoginUser) => {
@@ -21,7 +22,7 @@ const loginUser = async (payload: TLoginUser) => {
   // check user is exist
   const isUserExist = await User.findOne({
     id,
-  });
+  }).select('+password');
 
   if (!isUserExist) {
     throw new AppError(StatusCodes.NOT_FOUND, 'User not founded.');
@@ -38,9 +39,12 @@ const loginUser = async (payload: TLoginUser) => {
   }
 
   // compare password
+
+  console.log(isUserExist.password);
+
   const isPasswordMatched = await User.isPasswordMatched(
     password,
-    isUserExist.password
+    isUserExist.password as string
   );
   if (!isPasswordMatched) {
     throw new AppError(StatusCodes.FORBIDDEN, 'Password does not match.');
@@ -61,8 +65,69 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+// change password
+const changePassword = async (userData: JwtPayload, payload: TPasswordData) => {
+  /* 
+ 1. check user is exist
+ 2. check user is deleted
+ 3. check user is blocked
+ 4. check password is matched
+ 5. check password matched
+ 6. hash password
+ 7. send response
+ */
+
+  //  check user exist
+
+  // check user is exist
+  const isUserExist = await User.findOne({ id: userData.id }).select(
+    '+password'
+  );
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not found.');
+  }
+
+  // check user is deleted
+  if (isUserExist.isDeleted) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User is deleted.');
+  }
+
+  //check user is blocked
+  if (isUserExist.status === 'blocked') {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User is blocked');
+  }
+
+  // check password is matched
+  const isPasswordMatched = await User.isPasswordMatched(
+    payload.oldPassword,
+    isUserExist.password as string
+  );
+
+  if (!isPasswordMatched) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Password does not match.');
+  }
+
+  // hash password
+
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.salt_rounds)
+  );
+
+  await User.findOneAndUpdate(
+    { id: isUserExist.id },
+    {
+      password: hashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    }
+  );
+
+  return null;
+};
 const AuthService = {
   loginUser,
+  changePassword,
 };
 
 export default AuthService;

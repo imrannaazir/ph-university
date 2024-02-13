@@ -46,11 +46,23 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(StatusCodes.UNAUTHORIZED, 'User is blocked');
     }
 
+    // check if jwt issued before password changed
+    if (
+      isUserExist.passwordChangedAt &&
+      (await User.isJWTIssuedBeforePasswordChanged(
+        isUserExist.passwordChangedAt,
+        decoded.iat as number
+      ))
+    ) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User has not access.');
+    }
+
     // check user role is authorized
     if (requiredRoles && !requiredRoles.includes(decoded.role)) {
       throw new AppError(StatusCodes.UNAUTHORIZED, 'User is not authorized.');
     }
 
+    req.user = decoded as JwtPayload;
     next();
   });
 };

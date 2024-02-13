@@ -2,11 +2,12 @@ import { Router } from 'express';
 import StudentController from './student.controller';
 import validateRequest from '../../middleware/validateRequest';
 import { updateStudentValidationSchema } from './student.validation';
+import auth from '../../middleware/auth';
 
 const router = Router();
 
 // get all students
-router.get('/', StudentController.getAllStudents);
+router.get('/', auth('admin', 'faculty'), StudentController.getAllStudents);
 
 // get single student by Id
 router.get('/:id', StudentController.getSingleStudent);

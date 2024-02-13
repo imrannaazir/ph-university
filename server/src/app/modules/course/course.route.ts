@@ -6,8 +6,6 @@ import {
   updateCourseValidationSchema,
 } from './course.validation';
 import CourseController from './course.controller';
-import auth from '../../middleware/auth';
-import { USER_ROLES } from '../user/user.constant';
 
 const router = Router();
 
@@ -19,7 +17,7 @@ router.post(
 );
 
 // get all courses : GET
-router.get('/', auth(USER_ROLES.admin), CourseController.getAllCourses);
+router.get('/', CourseController.getAllCourses);
 
 // get single course : GET
 router.get('/:id', CourseController.getSingleCourse);

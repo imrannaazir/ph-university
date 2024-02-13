@@ -14,10 +14,15 @@ const userSchema = new Schema<TUser, UserModel>(
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
+      select: 0,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     role: {
       type: String,
@@ -41,7 +46,10 @@ const userSchema = new Schema<TUser, UserModel>(
 // encrypt password
 userSchema.pre('save', async function (next) {
   const user = this;
-  user.password = await bcrypt.hash(user.password, Number(config.salt_rounds));
+  user.password = await bcrypt.hash(
+    user.password as string,
+    Number(config.salt_rounds)
+  );
 
   next();
 });
@@ -59,5 +67,16 @@ userSchema.statics.isPasswordMatched = async function (
 ) {
   return await bcrypt.compare(textPassword, hashedPassword);
 };
+
+// static method for checking is jwt issued before password changed
+userSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
+  passwordChangedAt,
+  jwtIssuedAt
+) {
+  const passwordChangedTime: number =
+    new Date(passwordChangedAt).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedAt;
+};
+
 const User = model<TUser, UserModel>('user', userSchema);
 export default User;
