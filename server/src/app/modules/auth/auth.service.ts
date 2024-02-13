@@ -5,6 +5,7 @@ import { TLoginUser, TPasswordData } from './auth.interface';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import { generateToken } from './auth.utils';
 
 // login user
 const loginUser = async (payload: TLoginUser) => {
@@ -13,7 +14,7 @@ const loginUser = async (payload: TLoginUser) => {
  2. check user is deleted
  3. check user is blocked
  4. check password is matched
- 5. generate access token 
+ 5. generate access token & refresh token
  6. send response
  */
 
@@ -40,8 +41,6 @@ const loginUser = async (payload: TLoginUser) => {
 
   // compare password
 
-  console.log(isUserExist.password);
-
   const isPasswordMatched = await User.isPasswordMatched(
     password,
     isUserExist.password as string
@@ -51,16 +50,27 @@ const loginUser = async (payload: TLoginUser) => {
   }
 
   // generate JWT token
-
   const jwtPayload = {
     id: isUserExist.id,
     role: isUserExist.role,
   };
-  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: config.jwt_expires_in as string,
-  });
+
+  // access token
+  const accessToken = generateToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_expires_in as string
+  );
+
+  // refresh token
+  const refreshToken = generateToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string
+  );
   return {
     accessToken,
+    refreshToken,
     needsPasswordChanged: isUserExist.needsPasswordChange,
   };
 };
@@ -125,9 +135,26 @@ const changePassword = async (userData: JwtPayload, payload: TPasswordData) => {
 
   return null;
 };
+
+// generate refresh token
+const getRefreshToken = async (token: string) => {
+  /* 
+  1. verify token;
+  2. check if the user exist
+  3. check if user is blocked
+  4. check if user is deleted
+  5. check jwt token issued before password change
+  6. generate refresh token
+  */
+
+  // verify access token
+  const decoded = jwt.verify(token, config.jwt_access_secret as string);
+  console.log(decoded);
+};
 const AuthService = {
   loginUser,
   changePassword,
+  getRefreshToken,
 };
 
 export default AuthService;
