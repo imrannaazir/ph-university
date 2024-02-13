@@ -8,4 +8,6 @@ export default {
   default_password: process.env.DEFAULT_PASSWORD,
   salt_rounds: process.env.SALT_ROUNDS,
   NODE_ENV: process.env.NODE_ENV,
+  jwt_access_secret: process.env.JWT_ACCESS_SECRET,
+  jwt_expires_in: process.env.JWT_EXPIRES_IN,
 };
