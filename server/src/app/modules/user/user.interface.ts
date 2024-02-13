@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
+import { USER_ROLES } from './user.constant';
 
 export interface TUser {
   id: string;
@@ -9,6 +10,8 @@ export interface TUser {
   isDeleted?: boolean;
   needsPasswordChange: boolean;
 }
+
+export type TUserRole = keyof typeof USER_ROLES;
 
 export interface UserModel extends Model<TUser> {
   isPasswordMatched(
