@@ -3,17 +3,24 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import AuthService from './auth.service';
 import { JwtPayload } from 'jsonwebtoken';
+import config from '../../config';
 
 // login user
 const loginUser = catchAsync(async (req, res) => {
   const payload = req.body;
-  const result = await AuthService.loginUser(payload);
+  const { accessToken, refreshToken, needsPasswordChanged } =
+    await AuthService.loginUser(payload);
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: config.NODE_ENV === 'production',
+  });
 
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'User logged in successfully.',
-    data: result,
+    data: { accessToken, needsPasswordChanged },
   });
 });
 
@@ -33,15 +40,15 @@ const changePassword = catchAsync(async (req, res) => {
   });
 });
 
-// get refresh token
-const getRefreshToken = catchAsync(async (req, res) => {
-  const token = req.headers.authorization;
+//  refresh token
+const refreshToken = catchAsync(async (req, res) => {
+  const token = req.cookies.refreshToken;
 
-  const result = await AuthService.getRefreshToken(token as string);
+  const result = await AuthService.refreshToken(token as string);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Sent new refresh token.',
+    message: 'New access token retrieved successfully.',
     data: result,
   });
 });
@@ -49,7 +56,7 @@ const getRefreshToken = catchAsync(async (req, res) => {
 const AuthController = {
   loginUser,
   changePassword,
-  getRefreshToken,
+  refreshToken,
 };
 
 export default AuthController;

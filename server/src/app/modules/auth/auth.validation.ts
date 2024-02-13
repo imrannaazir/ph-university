@@ -13,3 +13,9 @@ export const changePasswordValidationSchema = z.object({
     newPassword: z.string(),
   }),
 });
+
+export const refreshTokenValidationSchema = z.object({
+  cookies: z.object({
+    refreshToken: z.string(),
+  }),
+});

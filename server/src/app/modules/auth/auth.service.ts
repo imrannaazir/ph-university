@@ -2,10 +2,10 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import User from '../user/user.model';
 import { TLoginUser, TPasswordData } from './auth.interface';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
-import { generateToken } from './auth.utils';
+import { generateToken, verifyToken } from './auth.utils';
 
 // login user
 const loginUser = async (payload: TLoginUser) => {
@@ -87,8 +87,6 @@ const changePassword = async (userData: JwtPayload, payload: TPasswordData) => {
  7. send response
  */
 
-  //  check user exist
-
   // check user is exist
   const isUserExist = await User.findOne({ id: userData.id }).select(
     '+password'
@@ -118,7 +116,6 @@ const changePassword = async (userData: JwtPayload, payload: TPasswordData) => {
   }
 
   // hash password
-
   const hashedPassword = await bcrypt.hash(
     payload.newPassword,
     Number(config.salt_rounds)
@@ -137,24 +134,64 @@ const changePassword = async (userData: JwtPayload, payload: TPasswordData) => {
 };
 
 // generate refresh token
-const getRefreshToken = async (token: string) => {
+const refreshToken = async (token: string) => {
   /* 
   1. verify token;
   2. check if the user exist
   3. check if user is blocked
   4. check if user is deleted
   5. check jwt token issued before password change
-  6. generate refresh token
+  6. generate access token
   */
 
-  // verify access token
-  const decoded = jwt.verify(token, config.jwt_access_secret as string);
-  console.log(decoded);
+  // verify refresh token
+  const decoded = verifyToken(
+    token,
+    config.jwt_refresh_secret as string
+  ) as JwtPayload;
+
+  // check is user exist
+  const isUserExist = await User.findOne({ id: decoded.id });
+
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not found.');
+  }
+
+  // check user is blocked
+  if (isUserExist.status === 'blocked') {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User has been blocked.');
+  }
+
+  //  check is user deleted
+  if (isUserExist.isDeleted) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User has been deleted.');
+  }
+
+  // check is jwt issued before password changed
+  if (
+    isUserExist.passwordChangedAt &&
+    (await User.isJWTIssuedBeforePasswordChanged(
+      isUserExist.passwordChangedAt,
+      decoded.iat as number
+    ))
+  ) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User is not authorized.');
+  }
+
+  // generate access token
+  const jwtPayload = { id: isUserExist.id, role: isUserExist.role };
+  const accessToken = generateToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_expires_in as string
+  );
+
+  return { accessToken };
 };
 const AuthService = {
   loginUser,
   changePassword,
-  getRefreshToken,
+  refreshToken,
 };
 
 export default AuthService;

@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
+// generate token
 export const generateToken = (
   payload: JwtPayload,
   secret: string,
@@ -10,4 +11,9 @@ export const generateToken = (
   });
 
   return token;
+};
+
+// verify token
+export const verifyToken = (token: string, secret: string) => {
+  return jwt.verify(token, secret);
 };

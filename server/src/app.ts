@@ -3,12 +3,14 @@ import cors from 'cors';
 import router from './app/routes';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFoundHandler from './app/middleware/notFoundHandler';
-// import globalErrorHandler from './app/middleware/globalErrorHandler';
+import config from './app/config';
+import cookieParser from 'cookie-parser';
 const app: Application = express();
 
 //parser
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({ origin: config.client_url }));
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
