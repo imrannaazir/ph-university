@@ -5,11 +5,11 @@ import EnrolledCourseService from './enrolledCourse.service';
 
 // create enrolled course
 const createEnrolledCourse = catchAsync(async (req, res) => {
-  const { userId } = req.user;
+  const { id } = req.user;
   const { offeredCourse } = req.body;
 
   const result = await EnrolledCourseService.createEnrolledCourse(
-    userId,
+    id,
     offeredCourse
   );
 
@@ -21,8 +21,26 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
   });
 });
 
+// update enrolled course
+const updateEnrolledCourse = catchAsync(async (req, res) => {
+  const facultyId = req.user.id;
+  const payload = req.body;
+  const result = await EnrolledCourseService.updateEnrolledCourse(
+    facultyId,
+    payload
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Enrolled course updated successfully.',
+    data: result,
+  });
+});
+
 const EnrolledCourseController = {
   createEnrolledCourse,
+  updateEnrolledCourse,
 };
 
 export default EnrolledCourseController;

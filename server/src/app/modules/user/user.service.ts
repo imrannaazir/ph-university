@@ -82,7 +82,8 @@ const createStudent = async (
     }
     //upload image
     const imageName = `${payload.name.firstName}${user.id}`;
-    const path = file.path;
+    const path = file?.path;
+
     const { secure_url } = await uploadImage(imageName, path);
     //create student
     if (Object.keys(newUser).length) {
@@ -139,7 +140,7 @@ const createFaculty = async (
 
     // upload image
     const imageName = `${payload.name.firstName}${user.id}`;
-    const path = file.path;
+    const path = file?.path;
     const { secure_url } = await uploadImage(imageName, path);
     // check user created
     if (!Object.keys(newUser[0]).length) {
@@ -225,7 +226,7 @@ const createAdmin = async (file: any, password: string, payload: TAdmin) => {
     // image upload
 
     const imageName = `${payload.name.firstName}${user.id}`;
-    const path = file.path;
+    const path = file?.path;
 
     const { secure_url } = await uploadImage(imageName, path);
     //insert userId and Id

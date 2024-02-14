@@ -20,6 +20,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check token is available
     const token = req.headers.authorization;
+
     if (!token) {
       throw new AppError(StatusCodes.UNAUTHORIZED, 'Access token is not sent.');
     }
@@ -63,6 +64,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     req.user = decoded as JwtPayload;
+
     next();
   });
 };

@@ -13,8 +13,6 @@ const uploadImage = (
   imageName: string,
   path: string
 ): Promise<UploadApiResponse> => {
-  console.log({ imageName, path });
-
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       path,
@@ -30,7 +28,7 @@ const uploadImage = (
           if (err) {
             console.log(err);
           } else {
-            console.log('File is deleted.');
+            console.log('File is deleted.', path);
           }
         });
       }
