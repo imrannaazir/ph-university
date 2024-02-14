@@ -6,7 +6,7 @@ import AcademicSemester from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import Student from '../student/student.model';
 import { generateStudentId } from '../student/student.utils';
-import { TUser } from './user.interface';
+import { TStatus, TUser } from './user.interface';
 import User from './user.model';
 import AcademicDepartment from '../academicDepartment/academicDepartment.model';
 import mongoose from 'mongoose';
@@ -248,9 +248,31 @@ const getMe = async (userId: string, userRole: string) => {
 
   return result;
 };
+
+// change status
+const changeStatus = async (userId: string, status: TStatus) => {
+  // check is user exist
+  const isUserExist = await User.findOne({ id: userId }, { _id: 1 });
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'User is not founded.');
+  }
+
+  const result = await User.findByIdAndUpdate(
+    isUserExist._id,
+    {
+      status,
+    },
+    {
+      new: true,
+    }
+  );
+
+  return result;
+};
 export const UserService = {
   createStudent,
   createFaculty,
   createAdmin,
+  changeStatus,
   getMe,
 };

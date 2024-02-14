@@ -5,6 +5,7 @@ import validateRequest from '../../middleware/validateRequest';
 import { createFacultyValidationSchema } from '../faculty/faculty.validation';
 import { createAdminValidationSchema } from '../admin/admin.validation';
 import auth from '../../middleware/auth';
+import { changeStatusValidationSchema } from './user.validation';
 
 const router = express.Router();
 
@@ -34,6 +35,14 @@ router.get(
   '/get-me',
   auth('admin', 'faculty', 'student'),
   UserController.getMe
+);
+
+// change status : PATCH
+router.patch(
+  '/change-status/:userId',
+  auth('admin'),
+  validateRequest(changeStatusValidationSchema),
+  UserController.changeStatus
 );
 
 export const UserRouters = router;
