@@ -22,6 +22,7 @@ const createStudent = async (password: string, payload: TStudent) => {
     id: '',
     password: '',
     role: 'student',
+    email: payload.email,
   };
 
   user.password = password ? password : config.default_password;
@@ -109,6 +110,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
     id: '',
     role: 'faculty',
     password: password ? password : config.default_password,
+    email: payload.email,
   };
   user.id = await generateFacultyId();
 
@@ -173,6 +175,7 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     id: '',
     role: 'admin',
     password: password ? password : config.default_password,
+    email: payload.email,
   };
 
   // set user ID

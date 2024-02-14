@@ -19,3 +19,9 @@ export const refreshTokenValidationSchema = z.object({
     refreshToken: z.string(),
   }),
 });
+
+export const forgetPasswordValidationSchema = z.object({
+  body: z.object({
+    userId: z.string(),
+  }),
+});

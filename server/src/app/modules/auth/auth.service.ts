@@ -6,6 +6,8 @@ import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 import { generateToken, verifyToken } from './auth.utils';
+import { TEmailPayload } from '../../interface/interface';
+import sendEmail from '../../utils/sendEmail';
 
 // login user
 const loginUser = async (payload: TLoginUser) => {
@@ -188,10 +190,60 @@ const refreshToken = async (token: string) => {
 
   return { accessToken };
 };
+
+// forget password
+const forgetPassword = async (userId: string) => {
+  /* 
+  1. check user is exist
+  2. check user is deleted
+  3. check user is blocked
+  4. 
+  */
+
+  // check user is exist
+  const isUserExist = await User.findOne({ id: userId });
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not founded.');
+  }
+
+  // check user is deleted
+  if (isUserExist.isDeleted) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User is deleted.');
+  }
+
+  // check user is blocked
+  if (isUserExist.status === 'blocked') {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User is blocked.');
+  }
+
+  // generate reset token
+  const jwtPayload: JwtPayload = {
+    id: isUserExist.id,
+    role: isUserExist.role,
+  };
+  const resetToken = generateToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m'
+  );
+
+  // resent link
+  const resetLink = `${config.client_url}?userId:${isUserExist.id}&token=${resetToken}`;
+  const emailPayload: TEmailPayload = {
+    html: resetLink,
+    receiver: isUserExist.email,
+    subject: 'Reset your password.',
+  };
+
+  sendEmail(emailPayload);
+
+  return null;
+};
 const AuthService = {
   loginUser,
   changePassword,
   refreshToken,
+  forgetPassword,
 };
 
 export default AuthService;

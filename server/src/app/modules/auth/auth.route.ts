@@ -2,6 +2,7 @@ import { Router } from 'express';
 import validateRequest from '../../middleware/validateRequest';
 import {
   changePasswordValidationSchema,
+  forgetPasswordValidationSchema,
   loginUserValidationSchema,
   refreshTokenValidationSchema,
 } from './auth.validation';
@@ -30,6 +31,13 @@ router.post(
   '/refresh-token',
   validateRequest(refreshTokenValidationSchema),
   AuthController.refreshToken
+);
+
+// forget password
+router.post(
+  '/forget-password',
+  validateRequest(forgetPasswordValidationSchema),
+  AuthController.forgetPassword
 );
 const AuthRoutes = router;
 export default AuthRoutes;

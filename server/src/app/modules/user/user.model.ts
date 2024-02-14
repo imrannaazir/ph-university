@@ -28,6 +28,11 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       enum: ['student', 'faculty', 'admin'],
     },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+    },
     status: {
       type: String,
       enum: ['active', 'blocked'],
