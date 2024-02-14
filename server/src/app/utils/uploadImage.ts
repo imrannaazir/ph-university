@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 import config from '../config';
 import multer from 'multer';
 import fs from 'fs';
@@ -9,7 +9,10 @@ cloudinary.config({
   api_secret: config.api_secret,
 });
 
-const uploadImage = (imageName: string, path: string) => {
+const uploadImage = (
+  imageName: string,
+  path: string
+): Promise<UploadApiResponse> => {
   console.log({ imageName, path });
 
   return new Promise((resolve, reject) => {
@@ -20,7 +23,7 @@ const uploadImage = (imageName: string, path: string) => {
         if (error) {
           reject(error);
         }
-        resolve(result);
+        resolve(result as UploadApiResponse);
         // delete a file asynchronously
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         fs.unlink(path, (err: any) => {

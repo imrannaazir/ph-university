@@ -17,19 +17,13 @@ import { TAdmin } from '../admin/admin.interface';
 import generateAdminId from '../admin/admin.utils';
 import Admin from '../admin/admin.model';
 import uploadImage from '../../utils/uploadImage';
-import { string } from 'zod';
 
+// create student
 const createStudent = async (
   file: any,
   password: string,
   payload: TStudent
 ) => {
-  console.log({
-    file,
-    password,
-    payload,
-  });
-
   const user: TUser = {
     id: '',
     password: '',
@@ -89,12 +83,12 @@ const createStudent = async (
     //upload image
     const imageName = `${payload.name.firstName}${user.id}`;
     const path = file.path;
-    const updatedImage = await uploadImage(imageName, path);
+    const { secure_url } = await uploadImage(imageName, path);
     //create student
     if (Object.keys(newUser).length) {
       payload.id = newUser[0].id;
       payload.user = newUser[0]._id; // reference id
-      payload.profileImage = updatedImage?.secure_url;
+      payload.profileImage = secure_url;
 
       //create student : transaction 2
       const student = await Student.create([payload], { session });
@@ -121,7 +115,11 @@ const createStudent = async (
 };
 
 // create faculty
-const createFaculty = async (password: string, payload: TFaculty) => {
+const createFaculty = async (
+  file: any,
+  password: string,
+  payload: TFaculty
+) => {
   const user: TUser = {
     id: '',
     role: 'faculty',
@@ -139,6 +137,10 @@ const createFaculty = async (password: string, payload: TFaculty) => {
     // create user user : Transaction 1
     const newUser = await User.create([user], { session });
 
+    // upload image
+    const imageName = `${payload.name.firstName}${user.id}`;
+    const path = file.path;
+    const { secure_url } = await uploadImage(imageName, path);
     // check user created
     if (!Object.keys(newUser[0]).length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user');
@@ -146,6 +148,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
 
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
+    payload.profileImage = secure_url;
 
     //check if faculty already exit by email
     const isEmailExist = await Faculty.findOne({ email: payload?.email });
@@ -186,7 +189,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
 };
 
 // create admin
-const createAdmin = async (password: string, payload: TAdmin) => {
+const createAdmin = async (file: any, password: string, payload: TAdmin) => {
   const user: TUser = {
     id: '',
     role: 'admin',
@@ -219,9 +222,16 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     if (!newUser[0]._id)
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user.');
 
+    // image upload
+
+    const imageName = `${payload.name.firstName}${user.id}`;
+    const path = file.path;
+
+    const { secure_url } = await uploadImage(imageName, path);
     //insert userId and Id
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
+    payload.profileImage = secure_url;
 
     // create admin :Transaction 2
     const newAdmin = await Admin.create([payload], { session });

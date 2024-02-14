@@ -25,6 +25,12 @@ router.post(
 // create faculty route
 router.post(
   '/create-faculty',
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+
+    next();
+  },
   validateRequest(createFacultyValidationSchema),
   UserController.createFaculty
 );
@@ -32,6 +38,11 @@ router.post(
 //create admin route
 router.post(
   '/create-admin',
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(createAdminValidationSchema),
   UserController.createAdmin
 );
