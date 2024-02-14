@@ -17,8 +17,19 @@ import { TAdmin } from '../admin/admin.interface';
 import generateAdminId from '../admin/admin.utils';
 import Admin from '../admin/admin.model';
 import uploadImage from '../../utils/uploadImage';
+import { string } from 'zod';
 
-const createStudent = async (password: string, payload: TStudent) => {
+const createStudent = async (
+  file: any,
+  password: string,
+  payload: TStudent
+) => {
+  console.log({
+    file,
+    password,
+    payload,
+  });
+
   const user: TUser = {
     id: '',
     password: '',
@@ -75,14 +86,15 @@ const createStudent = async (password: string, payload: TStudent) => {
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user.');
     }
-
     //upload image
-    uploadImage();
-
+    const imageName = `${payload.name.firstName}${user.id}`;
+    const path = file.path;
+    const updatedImage = await uploadImage(imageName, path);
     //create student
     if (Object.keys(newUser).length) {
       payload.id = newUser[0].id;
       payload.user = newUser[0]._id; // reference id
+      payload.profileImage = updatedImage?.secure_url;
 
       //create student : transaction 2
       const student = await Student.create([payload], { session });
