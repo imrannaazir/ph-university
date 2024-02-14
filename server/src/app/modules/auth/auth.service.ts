@@ -5,7 +5,7 @@ import { TLoginUser, TPasswordData } from './auth.interface';
 import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
-import { generateToken, verifyToken } from './auth.utils';
+import { generateToken, hashPassword, verifyToken } from './auth.utils';
 import { TEmailPayload } from '../../interface/interface';
 import sendEmail from '../../utils/sendEmail';
 
@@ -239,11 +239,60 @@ const forgetPassword = async (userId: string) => {
 
   return null;
 };
+
+// reset password
+const resetPassword = async (payload: {
+  userId: string;
+  token: string;
+  newPassword: string;
+}) => {
+  const { userId, token, newPassword } = payload;
+  // check user is exist
+  const isUserExist = await User.findOne({
+    id: userId,
+  });
+
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not founded.');
+  }
+
+  // check if user is deleted
+  if (isUserExist.isDeleted) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User is deleted.');
+  }
+
+  // check is user is blocked
+  if (isUserExist.status === 'blocked') {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User is blocked.');
+  }
+
+  // verify token
+  const decoded = verifyToken(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+
+  // check is decoded user id and db user id is same
+  if (decoded.id !== isUserExist.id) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'Your are forbidden.');
+  }
+
+  // hash password
+  const hashedPassword = await hashPassword(newPassword);
+  await User.findByIdAndUpdate(isUserExist._id, {
+    password: hashedPassword,
+    needsPasswordChange: false,
+    passwordChangedAt: new Date(),
+  });
+
+  return null;
+};
 const AuthService = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };
 
 export default AuthService;

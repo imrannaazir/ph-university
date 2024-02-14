@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import config from '../config';
 import { TEmailPayload } from '../interface/interface';
+
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   host: 'smtp.gmail.com',
@@ -11,6 +12,8 @@ const transporter = nodemailer.createTransport({
     pass: config.email_app_password,
   },
 });
+
+// utility for send email
 const sendEmail = async (payload: TEmailPayload) => {
   const { receiver, html, subject, text } = payload;
   try {

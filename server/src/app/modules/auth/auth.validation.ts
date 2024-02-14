@@ -25,3 +25,10 @@ export const forgetPasswordValidationSchema = z.object({
     userId: z.string(),
   }),
 });
+
+export const resetPasswordValidationSchema = z.object({
+  body: z.object({
+    userId: z.string(),
+    newPassword: z.string(),
+  }),
+});
