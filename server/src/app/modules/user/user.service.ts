@@ -223,8 +223,34 @@ const createAdmin = async (password: string, payload: TAdmin) => {
     throw new AppError(StatusCodes.BAD_REQUEST, error.message);
   }
 };
+
+// get me
+const getMe = async (userId: string, userRole: string) => {
+  // check if user exist
+  const isUserExist = await User.findOne({ id: userId, role: userRole });
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User not founded.');
+  }
+
+  let result;
+
+  if (isUserExist.role === 'student') {
+    result = await Student.findOne({ id: isUserExist.id });
+  } else if (isUserExist.role === 'admin') {
+    result = await Admin.findOne({ id: isUserExist.id });
+  } else if (isUserExist.role === 'faculty') {
+    result = await Faculty.findOne({ id: isUserExist.id });
+  }
+
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not founded.');
+  }
+
+  return result;
+};
 export const UserService = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
 };

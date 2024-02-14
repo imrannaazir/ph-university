@@ -2,6 +2,7 @@ import { UserService } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
+import { JwtPayload } from 'jsonwebtoken';
 
 //create student
 const createStudent = catchAsync(async (req, res) => {
@@ -43,8 +44,23 @@ const createAdmin = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// get me
+const getMe = catchAsync(async (req, res) => {
+  const { id, role } = req.user as JwtPayload;
+
+  const result = await UserService.getMe(id, role);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'LoggedIn user data retrieved successfully.',
+    data: result,
+  });
+});
 export const UserController = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
 };
