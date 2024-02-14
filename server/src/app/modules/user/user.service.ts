@@ -16,6 +16,7 @@ import Faculty from '../faculty/faculty.model';
 import { TAdmin } from '../admin/admin.interface';
 import generateAdminId from '../admin/admin.utils';
 import Admin from '../admin/admin.model';
+import uploadImage from '../../utils/uploadImage';
 
 const createStudent = async (password: string, payload: TStudent) => {
   const user: TUser = {
@@ -74,6 +75,9 @@ const createStudent = async (password: string, payload: TStudent) => {
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user.');
     }
+
+    //upload image
+    uploadImage();
 
     //create student
     if (Object.keys(newUser).length) {
