@@ -27,11 +27,12 @@ const getAllCourse = async (query: Record<string, unknown>) => {
     .paginate();
 
   const result = await courseQuery.modelQuery;
+  const meta = await courseQuery.countTotal();
 
   if (!result.length)
     throw new AppError(StatusCodes.NOT_FOUND, 'No courses founded.');
 
-  return result;
+  return { meta, result };
 };
 
 // get single course by Id
