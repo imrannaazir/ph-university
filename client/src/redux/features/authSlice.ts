@@ -5,6 +5,8 @@ type TAuthState = {
   user: {
     id: string;
     role: string;
+    iat: number;
+    exp: number;
   } | null;
   token: string | null;
 };
