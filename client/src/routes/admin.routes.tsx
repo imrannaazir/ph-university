@@ -4,8 +4,9 @@ import CreateAdmin from "../pages/admin/CreateAdmin";
 import CreateFaculty from "../pages/admin/CreateFaculty";
 import CreateMember from "../pages/admin/CreateMember";
 import CreateStudent from "../pages/admin/CreateStudent";
+import { TPath } from "../types";
 
-export const adminPaths = [
+export const adminPaths: TPath[] = [
   {
     name: "Dashboard",
     path: "dashboard",
