@@ -5,6 +5,7 @@ import {
   createAcademicSemesterValidationSchema,
   updateAcademicSemesterValidationSchema,
 } from './academicSemester.validation';
+import auth from '../../middleware/auth';
 
 const router = Router();
 
@@ -16,10 +17,18 @@ router.post(
 );
 
 //get all academic semester
-router.get('/all', AcademicSemesterController.getAllAcademicSemester);
+router.get(
+  '/all',
+  auth('admin'),
+  AcademicSemesterController.getAllAcademicSemester
+);
 
 // get academic semester by id
-router.get('/:id', AcademicSemesterController.getSingleAcademicSemesterById);
+router.get(
+  '/:id',
+  auth('admin'),
+  AcademicSemesterController.getSingleAcademicSemesterById
+);
 
 // update academic semester by id
 router.patch(

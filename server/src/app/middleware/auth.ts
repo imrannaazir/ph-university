@@ -3,9 +3,10 @@ import catchAsync from '../utils/catchAsync';
 import { TUserRole } from '../modules/user/user.interface';
 import AppError from '../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import User from '../modules/user/user.model';
+import { verifyToken } from '../modules/auth/auth.utils';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   /* 
@@ -26,10 +27,10 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // check token is valid
-    const decoded = jwt.verify(
+    const decoded = (await verifyToken(
       token,
       config.jwt_access_secret as string
-    ) as JwtPayload;
+    )) as JwtPayload;
 
     // check user is exist
     const isUserExist = await User.findOne({ id: decoded.id });

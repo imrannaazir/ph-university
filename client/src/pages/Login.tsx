@@ -1,8 +1,10 @@
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useLoginMutation } from "../redux/features/authApi";
+import { useLoginMutation } from "../redux/features/auth/authApi";
 import { useAppDispatch } from "../redux/hooks";
-import { logIn } from "../redux/features/authSlice";
+import { logIn } from "../redux/features/auth/authSlice";
 import decodeToken from "../utils/decodeToken";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 // type
 type TInputs = {
@@ -11,9 +13,15 @@ type TInputs = {
 };
 
 const LoginPage = () => {
-  const [login, { isLoading, error, data }] = useLoginMutation();
+  const [login, { error }] = useLoginMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
+  const toastId = toast.loading("Logging in.");
+
+  if (error) {
+    toast.error("Something went wrong.", { id: toastId });
+  }
   const { handleSubmit, register } = useForm<TInputs>();
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     const userData = {
@@ -30,6 +38,8 @@ const LoginPage = () => {
           user: decodeToken(response?.data.accessToken),
         })
       );
+      toast.success("Logged in successfully.", { id: toastId, duration: 2000 });
+      navigate(`/`);
     }
   };
   return (

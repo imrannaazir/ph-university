@@ -10,7 +10,7 @@ const app: Application = express();
 //parser
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: config.client_url }));
+app.use(cors({ origin: config.client_url, credentials: true }));
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

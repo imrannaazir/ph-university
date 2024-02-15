@@ -3,16 +3,21 @@ import sidebarItemsGenerator from "../../libs/sidebarItemsGenerator";
 import { studentPaths } from "../../routes/student.route";
 import { adminPaths } from "../../routes/admin.routes";
 import { facultyPaths } from "../../routes/faculty.routes";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { logOut, selectUser } from "../../redux/features/auth/authSlice";
 const { Sider } = Layout;
 
 const Sidebar = () => {
+  const user = useAppSelector(selectUser);
+  const role = user?.role;
+  const dispatch = useAppDispatch();
+
   const UserRole = {
     ADMIN: "admin",
     FACULTY: "faculty",
     STUDENT: "student",
   };
   let sidebarItems;
-  const role = "admin";
 
   switch (role) {
     case UserRole.STUDENT:
@@ -50,6 +55,8 @@ const Sidebar = () => {
       >
         PH Uni
       </div>
+
+      <button onClick={() => dispatch(logOut())}>Logout</button>
       <Menu
         theme="dark"
         mode="inline"

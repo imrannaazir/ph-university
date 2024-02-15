@@ -1,4 +1,5 @@
 import About from "../pages/About";
+import AcademicSemesterPage from "../pages/admin/AcademicSemester";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import CreateAdmin from "../pages/admin/CreateAdmin";
 import CreateFaculty from "../pages/admin/CreateFaculty";
@@ -34,6 +35,11 @@ export const adminPaths: TPath[] = [
         name: "Create Member",
         path: "create-member",
         element: <CreateMember />,
+      },
+      {
+        name: "Academic Semester",
+        path: "academic-semester",
+        element: <AcademicSemesterPage />,
       },
     ],
   },

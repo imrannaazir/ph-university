@@ -1,6 +1,8 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import AppError from '../../errors/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 // generate token
 export const generateToken = (
@@ -16,8 +18,12 @@ export const generateToken = (
 };
 
 // verify token
-export const verifyToken = (token: string, secret: string) => {
-  return jwt.verify(token, secret);
+export const verifyToken = async (token: string, secret: string) => {
+  try {
+    return jwt.verify(token, secret);
+  } catch (error) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User is not authorized.');
+  }
 };
 
 // hash password

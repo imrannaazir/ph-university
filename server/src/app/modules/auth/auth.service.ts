@@ -147,10 +147,10 @@ const refreshToken = async (token: string) => {
   */
 
   // verify refresh token
-  const decoded = verifyToken(
+  const decoded = (await verifyToken(
     token,
     config.jwt_refresh_secret as string
-  ) as JwtPayload;
+  )) as JwtPayload;
 
   // check is user exist
   const isUserExist = await User.findOne({ id: decoded.id });
@@ -267,10 +267,10 @@ const resetPassword = async (payload: {
   }
 
   // verify token
-  const decoded = verifyToken(
+  const decoded = (await verifyToken(
     token,
     config.jwt_access_secret as string
-  ) as JwtPayload;
+  )) as JwtPayload;
 
   // check is decoded user id and db user id is same
   if (decoded.id !== isUserExist.id) {
