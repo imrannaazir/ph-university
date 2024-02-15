@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
+import { toast } from "sonner";
 
+export type TUser = {
+  id: string;
+  role: string;
+  iat: number;
+  exp: number;
+};
 type TAuthState = {
-  user: {
-    id: string;
-    role: string;
-    iat: number;
-    exp: number;
-  } | null;
+  user: TUser | null;
   token: string | null;
 };
 
@@ -30,6 +32,7 @@ const authSlice = createSlice({
     logOut: (state) => {
       state.token = null;
       state.user = null;
+      toast.success("Logged out.", { duration: 2000 });
     },
   },
 });
