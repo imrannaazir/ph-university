@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
-import { Schema, model } from 'mongoose';
-import bcrypt from 'bcrypt';
-import config from '../../config';
-import { TUser, UserModel } from './user.interface';
+import { Schema, model } from 'mongoose'
+import bcrypt from 'bcrypt'
+import config from '../../config'
+import { TUser, UserModel } from './user.interface'
 
 const userSchema = new Schema<TUser, UserModel>(
   {
@@ -26,7 +26,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['student', 'faculty', 'admin'],
+      enum: ['student', 'faculty', 'admin', 'superAdmin'],
     },
     email: {
       type: String,
@@ -46,32 +46,32 @@ const userSchema = new Schema<TUser, UserModel>(
   {
     timestamps: true,
   }
-);
+)
 
 // encrypt password
 userSchema.pre('save', async function (next) {
-  const user = this;
+  const user = this
   user.password = await bcrypt.hash(
     user.password as string,
     Number(config.salt_rounds)
-  );
+  )
 
-  next();
-});
+  next()
+})
 
 // hide password
 userSchema.post('save', async function (doc, next) {
-  doc.set('password', undefined);
-  next();
-});
+  doc.set('password', undefined)
+  next()
+})
 
 // static method for comparing password
 userSchema.statics.isPasswordMatched = async function (
   textPassword,
   hashedPassword
 ) {
-  return await bcrypt.compare(textPassword, hashedPassword);
-};
+  return await bcrypt.compare(textPassword, hashedPassword)
+}
 
 // static method for checking is jwt issued before password changed
 userSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
@@ -79,9 +79,9 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
   jwtIssuedAt
 ) {
   const passwordChangedTime: number =
-    new Date(passwordChangedAt).getTime() / 1000;
-  return passwordChangedTime > jwtIssuedAt;
-};
+    new Date(passwordChangedAt).getTime() / 1000
+  return passwordChangedTime > jwtIssuedAt
+}
 
-const User = model<TUser, UserModel>('user', userSchema);
-export default User;
+const User = model<TUser, UserModel>('user', userSchema)
+export default User
