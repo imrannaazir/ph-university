@@ -5,4 +5,6 @@ export const USER_ROLES = {
   superAdmin: 'superAdmin',
 } as const
 
+export const UserRoles = ['student', 'faculty', 'admin', 'superAdmin'] as const
+
 export const Status = ['active', 'blocked']

@@ -1,10 +1,10 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose'
 import {
   TGuardian,
   TLocalGuardian,
   TStudent,
   TStudentName,
-} from './student.interface';
+} from './student.interface'
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -23,7 +23,7 @@ const studentNameSchema = new Schema<TStudentName>({
     max: [20, 'Last name can not contain more than 20 chars'],
     trim: true,
   },
-});
+})
 
 const guardianSchema = new Schema<TGuardian>({
   fatherName: {
@@ -50,7 +50,7 @@ const guardianSchema = new Schema<TGuardian>({
     type: String,
     required: [true, 'Mother contact no is required'],
   },
-});
+})
 
 const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
@@ -70,7 +70,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
     type: String,
     required: [true, 'Address of local guardian is required'],
   },
-});
+})
 const studentSchema = new Schema<TStudent>(
   {
     id: {
@@ -138,9 +138,13 @@ const studentSchema = new Schema<TStudent>(
       type: Schema.Types.ObjectId,
       ref: 'AcademicDepartment',
     },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
+    },
   },
   { timestamps: true }
-);
+)
 
-const Student = model<TStudent>('student', studentSchema);
-export default Student;
+const Student = model<TStudent>('student', studentSchema)
+export default Student

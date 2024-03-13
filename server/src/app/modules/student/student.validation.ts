@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 //validation schema for creating
 export const studentNameValidationSchema = z.object({
   firstName: z.string().trim().max(20),
   lastName: z.string().trim().max(20),
   middleName: z.string().trim().max(20),
-});
+})
 
 export const studentGuardianValidationSchema = z.object({
   fatherName: z.string(),
@@ -14,14 +14,14 @@ export const studentGuardianValidationSchema = z.object({
   motherName: z.string(),
   motherOccupation: z.string(),
   motherContactNo: z.string(),
-});
+})
 
 export const studentLocalGuardianValidationSchema = z.object({
   name: z.string(),
   address: z.string(),
   contactNo: z.string(),
   occupation: z.string(),
-});
+})
 
 export const createStudentValidationSchema = z.object({
   body: z.object({
@@ -42,7 +42,7 @@ export const createStudentValidationSchema = z.object({
       academicDepartment: z.string(),
     }),
   }),
-});
+})
 
 // validation schema for updating
 
@@ -50,7 +50,7 @@ export const updateStudentNameValidationSchema = z.object({
   firstName: z.string().trim().max(20).optional(),
   lastName: z.string().trim().max(20).optional(),
   middleName: z.string().trim().max(20).optional(),
-});
+})
 
 export const updateStudentGuardianValidationSchema = z.object({
   fatherName: z.string().optional(),
@@ -59,14 +59,14 @@ export const updateStudentGuardianValidationSchema = z.object({
   motherName: z.string().optional(),
   motherOccupation: z.string().optional(),
   motherContactNo: z.string().optional(),
-});
+})
 
 export const updateStudentLocalGuardianValidationSchema = z.object({
   name: z.string().optional(),
   address: z.string().optional(),
   contactNo: z.string().optional(),
   occupation: z.string().optional(),
-});
+})
 
 export const updateStudentValidationSchema = z.object({
   body: z.object({
@@ -86,4 +86,4 @@ export const updateStudentValidationSchema = z.object({
     admissionSemester: z.string().optional(),
     academicDepartment: z.string().optional(),
   }),
-});
+})

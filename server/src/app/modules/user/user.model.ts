@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt'
 import config from '../../config'
 import { TUser, UserModel } from './user.interface'
+import { UserRoles } from './user.constant'
 
 const userSchema = new Schema<TUser, UserModel>(
   {
@@ -26,7 +27,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['student', 'faculty', 'admin', 'superAdmin'],
+      enum: UserRoles,
     },
     email: {
       type: String,
