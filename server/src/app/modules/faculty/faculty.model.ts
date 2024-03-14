@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
-import { TFaculty, TFacultyName } from './faculty.interface';
-import { BloodGroups, FacultyGender } from './faculty.constant';
+import { Schema, model } from 'mongoose'
+import { TFaculty, TFacultyName } from './faculty.interface'
+import { BloodGroups, FacultyGender } from './faculty.constant'
 
 const facultyNameSchema = new Schema<TFacultyName>({
   firstName: {
@@ -17,7 +17,7 @@ const facultyNameSchema = new Schema<TFacultyName>({
     required: true,
     trim: true,
   },
-});
+})
 
 const facultySchema = new Schema<TFaculty>(
   {
@@ -43,6 +43,11 @@ const facultySchema = new Schema<TFaculty>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       ref: 'academicDepartment',
+      required: true,
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'academicFaculty',
       required: true,
     },
     contactNo: {
@@ -83,8 +88,8 @@ const facultySchema = new Schema<TFaculty>(
     },
   },
   { timestamps: true }
-);
+)
 
-const Faculty = model<TFaculty>('faculty', facultySchema);
+const Faculty = model<TFaculty>('faculty', facultySchema)
 
-export default Faculty;
+export default Faculty

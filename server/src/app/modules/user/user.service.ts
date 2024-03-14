@@ -177,6 +177,8 @@ const createFaculty = async (
       )
     }
 
+    payload.academicFaculty = isAcademicDepartmentExist.academicFaculty
+
     // create faculty
     const newFaculty = await Faculty.create([payload], { session })
     //check faculty created

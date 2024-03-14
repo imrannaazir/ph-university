@@ -1,11 +1,11 @@
-import { Types } from 'mongoose';
+import { Types } from 'mongoose'
 
 export type TFacultyName = {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-};
-export type TGender = 'Male' | 'Female' | 'Other';
+  firstName: string
+  middleName?: string
+  lastName: string
+}
+export type TGender = 'Male' | 'Female' | 'Other'
 export type TBloodGroup =
   | 'A+'
   | 'A-'
@@ -14,20 +14,21 @@ export type TBloodGroup =
   | 'AB+'
   | 'AB-'
   | 'O+'
-  | 'O-';
+  | 'O-'
 export type TFaculty = {
-  id: string;
-  user: Types.ObjectId;
-  name: TFacultyName;
-  designation: string;
-  gender: TGender;
-  email: string;
-  dateOfBirth?: Date;
-  contactNo: string;
-  bloodGroup: TBloodGroup;
-  presentAddress: string;
-  permanentAddress: string;
-  profileImage?: string;
-  isDeleted?: boolean;
-  academicDepartment: Types.ObjectId;
-};
+  id: string
+  user: Types.ObjectId
+  name: TFacultyName
+  designation: string
+  gender: TGender
+  email: string
+  dateOfBirth?: Date
+  contactNo: string
+  bloodGroup: TBloodGroup
+  presentAddress: string
+  permanentAddress: string
+  profileImage?: string
+  isDeleted?: boolean
+  academicDepartment: Types.ObjectId
+  academicFaculty: Types.ObjectId
+}
