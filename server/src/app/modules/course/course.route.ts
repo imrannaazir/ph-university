@@ -63,5 +63,12 @@ router.delete(
   CourseController.removeFacultiesFromCourse
 )
 
+// get faculties with course
+router.get(
+  '/:id/faculties',
+  auth('admin', 'faculty', 'student', 'superAdmin'),
+  CourseController.getFacultiesWithCourse
+)
+
 const CourseRoutes = router
 export default CourseRoutes

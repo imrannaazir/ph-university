@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { StatusCodes } from 'http-status-codes';
-import QueryBuilder from '../../builder/QueryBuilder';
-import AppError from '../../errors/AppError';
-import { CourseSearchableFields } from './course.constant';
-import { TCourse, TCourseFaculties } from './course.interface';
-import Course, { CourseFaculties } from './course.model';
-import mongoose from 'mongoose';
-import config from '../../config';
+import { StatusCodes } from 'http-status-codes'
+import QueryBuilder from '../../builder/QueryBuilder'
+import AppError from '../../errors/AppError'
+import { CourseSearchableFields } from './course.constant'
+import { TCourse, TCourseFaculties } from './course.interface'
+import Course, { CourseFaculties } from './course.model'
+import mongoose from 'mongoose'
+import config from '../../config'
 
 // create course
 const createCourse = async (payload: TCourse) => {
-  const result = await Course.create(payload);
-  return result;
-};
+  const result = await Course.create(payload)
+  return result
+}
 
 // get all course
 const getAllCourse = async (query: Record<string, unknown>) => {
@@ -24,44 +24,41 @@ const getAllCourse = async (query: Record<string, unknown>) => {
     .filters()
     .sort()
     .fields()
-    .paginate();
+    .paginate()
 
-  const result = await courseQuery.modelQuery;
-  const meta = await courseQuery.countTotal();
+  const result = await courseQuery.modelQuery
+  const meta = await courseQuery.countTotal()
 
   if (!result.length)
-    throw new AppError(StatusCodes.NOT_FOUND, 'No courses founded.');
+    throw new AppError(StatusCodes.NOT_FOUND, 'No courses founded.')
 
-  return { meta, result };
-};
+  return { meta, result }
+}
 
 // get single course by Id
 const getSingleCourse = async (id: string) => {
-  const result = await Course.findById(id).populate('preRequisites.course');
+  const result = await Course.findById(id).populate('preRequisites.course')
 
   if (!result?._id)
-    throw new AppError(StatusCodes.NOT_FOUND, `Course not founded by Id:${id}`);
-  return result;
-};
+    throw new AppError(StatusCodes.NOT_FOUND, `Course not founded by Id:${id}`)
+  return result
+}
 
 // update course by Id
 const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
   // check if course exist
-  const isCourseExist = await Course.findById(id);
+  const isCourseExist = await Course.findById(id)
   if (!isCourseExist?._id)
-    throw new AppError(
-      StatusCodes.NOT_FOUND,
-      `Course not founded by Id: ${id}`
-    );
+    throw new AppError(StatusCodes.NOT_FOUND, `Course not founded by Id: ${id}`)
 
-  const { preRequisites, ...remainingData } = payload;
+  const { preRequisites, ...remainingData } = payload
 
   // create session
-  const session = await mongoose.startSession();
+  const session = await mongoose.startSession()
 
   try {
     // start transaction
-    session.startTransaction();
+    session.startTransaction()
 
     // update primitive values
 
@@ -70,19 +67,19 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
       id,
       remainingData,
       { new: true, runValidators: true, session }
-    );
+    )
 
     if (!updatedPrimitiveCourseData)
       throw new AppError(
         StatusCodes.BAD_REQUEST,
         'Failed to update primitive values of  course. '
-      );
+      )
 
     // if payload carries prerequisites
     if (preRequisites && preRequisites.length > 0) {
       const preRequisitesToDelete = preRequisites
-        .filter((elm) => elm.course && elm.isDeleted)
-        .map((elm) => elm.course);
+        .filter(elm => elm.course && elm.isDeleted)
+        .map(elm => elm.course)
 
       // delete pre requisite course from course
       // transaction 2
@@ -94,17 +91,17 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
           },
         },
         { new: true, runValidators: true, session }
-      );
+      )
 
       if (!deletedPreRequisiteCourses)
         throw new AppError(
           StatusCodes.BAD_REQUEST,
           `Failed to remove preRequisite courses from Course.`
-        );
+        )
 
       const preRequisiteCoursesToAdd = preRequisites.filter(
-        (elm) => elm.course && !elm.isDeleted
-      );
+        elm => elm.course && !elm.isDeleted
+      )
 
       // transaction 3
       const preRequisiteAddedCourse = await Course.findByIdAndUpdate(
@@ -117,56 +114,56 @@ const updateCourseById = async (id: string, payload: Partial<TCourse>) => {
           },
         },
         { new: true, runValidators: true, session }
-      );
+      )
 
       if (!preRequisiteAddedCourse)
         throw new AppError(
           StatusCodes.BAD_REQUEST,
           'Failed to add pre requisites to course.'
-        );
+        )
     }
 
-    await session.commitTransaction();
-    await session.endSession();
+    await session.commitTransaction()
+    await session.endSession()
 
-    const result = await Course.findById(id);
+    const result = await Course.findById(id)
 
-    return result;
+    return result
   } catch (error: any) {
-    await session.abortTransaction();
-    await session.endSession();
+    await session.abortTransaction()
+    await session.endSession()
     throw new AppError(
       StatusCodes.BAD_REQUEST,
       config.NODE_ENV === 'development'
         ? error.message
         : 'Failed to update course.'
-    );
+    )
   }
-};
+}
 
 // delete course by ID
 const deleteCourseById = async (id: string) => {
   // check course existence
-  const isCourseExist = await Course.findById(id);
+  const isCourseExist = await Course.findById(id)
   if (!isCourseExist?._id)
     throw new AppError(
       StatusCodes.BAD_REQUEST,
       `Course not founded by Id : ${id}`
-    );
+    )
 
   const deletedCourse = await Course.findByIdAndUpdate(
     id,
     { isDeleted: true },
     { new: true }
-  );
+  )
 
   if (!deletedCourse?._id)
-    throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to delete course.');
+    throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to delete course.')
 
   return {
     deletedCourseId: deletedCourse._id,
-  };
-};
+  }
+}
 
 // assign faculties on course
 const assignFacultiesOnCourse = async (
@@ -185,9 +182,9 @@ const assignFacultiesOnCourse = async (
       upsert: true,
       new: true,
     }
-  );
-  return courseFaculties;
-};
+  )
+  return courseFaculties
+}
 
 // remove faculties from course
 const removeFacultiesFromCourse = async (
@@ -200,11 +197,28 @@ const removeFacultiesFromCourse = async (
       $pull: { faculties: { $in: payload } },
     },
     { new: true }
-  );
+  )
 
-  return result;
-};
+  return result
+}
 
+// get faculties with course
+const getFacultiesWithCourse = async (courseId: string) => {
+  // check is course exist with id
+  const isCourseExist = await Course.findById(courseId)
+  if (!isCourseExist) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Course not founded by the id.')
+  }
+
+  const result = await CourseFaculties.findOne({ course: courseId }).populate(
+    'faculties'
+  )
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Course faculties not founded.')
+  }
+
+  return result
+}
 const CourseService = {
   createCourse,
   getAllCourse,
@@ -213,5 +227,6 @@ const CourseService = {
   deleteCourseById,
   assignFacultiesOnCourse,
   removeFacultiesFromCourse,
-};
-export default CourseService;
+  getFacultiesWithCourse,
+}
+export default CourseService
