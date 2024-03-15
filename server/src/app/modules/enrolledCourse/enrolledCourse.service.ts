@@ -1,14 +1,15 @@
-import mongoose, { Types } from 'mongoose';
-import OfferedCourse from '../offeredCourse/offeredCourse.model';
-import AppError from '../../errors/AppError';
-import { StatusCodes } from 'http-status-codes';
-import EnrolledCourse from './enrolledCourse.model';
-import Student from '../student/student.model';
-import SemesterRegistration from '../semesterRegistration/semesterRegistration.model';
-import Course from '../course/course.model';
-import { TEnrolledCourse } from './enrolledCourse.interface';
-import Faculty from '../faculty/faculty.model';
-import { calculateGradesPoints } from './enrolledCourse.utils';
+import mongoose, { Types } from 'mongoose'
+import OfferedCourse from '../offeredCourse/offeredCourse.model'
+import AppError from '../../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
+import EnrolledCourse from './enrolledCourse.model'
+import Student from '../student/student.model'
+import SemesterRegistration from '../semesterRegistration/semesterRegistration.model'
+import Course from '../course/course.model'
+import { TEnrolledCourse } from './enrolledCourse.interface'
+import Faculty from '../faculty/faculty.model'
+import { calculateGradesPoints } from './enrolledCourse.utils'
+import QueryBuilder from '../../builder/QueryBuilder'
 
 // create enrolled course
 const createEnrolledCourse = async (
@@ -25,16 +26,16 @@ const createEnrolledCourse = async (
     */
 
   // check offered course exist
-  const isOfferedCourseExist = await OfferedCourse.findById(offeredCourse);
+  const isOfferedCourseExist = await OfferedCourse.findById(offeredCourse)
   if (!isOfferedCourseExist) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.');
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.')
   }
 
   // check student exist
-  const isStudentExist = await Student.findOne({ id: userId }, { _id: 1 });
+  const isStudentExist = await Student.findOne({ id: userId }, { _id: 1 })
 
   if (!isStudentExist) {
-    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not founded.');
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'User not founded.')
   }
 
   // check is already enrolled
@@ -42,23 +43,23 @@ const createEnrolledCourse = async (
     offeredCourse,
     student: isStudentExist._id,
     semesterRegistration: isOfferedCourseExist.semesterRegistration,
-  });
+  })
   if (isUserAlreadyEnrolled) {
     throw new AppError(
       StatusCodes.BAD_REQUEST,
       'User already enrolled on this offered course.'
-    );
+    )
   }
 
   // max credits
   const semesterRegistration = await SemesterRegistration.findById(
     isOfferedCourseExist.semesterRegistration
-  ).select('maxCredit');
+  ).select('maxCredit')
 
-  const maxCredit = semesterRegistration?.maxCredit;
+  const maxCredit = semesterRegistration?.maxCredit
 
-  const course = await Course.findById(isOfferedCourseExist.course);
-  const currentCredit = course?.credits;
+  const course = await Course.findById(isOfferedCourseExist.course)
+  const currentCredit = course?.credits
   // check max credits exceed
   const enrolledCourses = await EnrolledCourse.aggregate([
     {
@@ -90,21 +91,21 @@ const createEnrolledCourse = async (
         totalEnrolledCourse: 1,
       },
     },
-  ]);
+  ])
 
   const totalCredits =
-    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCourse : 0;
+    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCourse : 0
 
   if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
     throw new AppError(
       StatusCodes.BAD_REQUEST,
       'You have exceeded maximum number of credits.'
-    );
+    )
   }
 
-  const session = await mongoose.startSession();
+  const session = await mongoose.startSession()
   try {
-    session.startTransaction();
+    session.startTransaction()
 
     const result = await EnrolledCourse.create(
       [
@@ -120,31 +121,87 @@ const createEnrolledCourse = async (
         },
       ],
       { session }
-    );
+    )
 
     if (!result) {
       throw new AppError(
         StatusCodes.NOT_FOUND,
         'Failed to create enrolled course.'
-      );
+      )
     }
 
     // decrease from max capacity
-    const maxCapacity = isOfferedCourseExist.maxCapacity;
+    const maxCapacity = isOfferedCourseExist.maxCapacity
     await OfferedCourse.findByIdAndUpdate(isOfferedCourseExist._id, {
       maxCapacity: maxCapacity - 1,
-    });
+    })
 
-    await session.commitTransaction();
-    await session.endSession();
-    return result;
+    await session.commitTransaction()
+    await session.endSession()
+    return result
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error(error);
+    await session.abortTransaction()
+    await session.endSession()
+    throw new Error(error)
   }
-};
+}
+
+// get all enrolled course
+const getAllEnrolledCourses = async (
+  facultyId: string,
+  query: Record<string, unknown>
+) => {
+  /* 
+  - check faculty is exist
+  - query the enrolled course of faculty
+  */
+  const isFacultyExist = await Faculty.findOne({ id: facultyId })
+  if (!isFacultyExist) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not founded.')
+  }
+
+  const facultyModelQuery = new QueryBuilder(
+    EnrolledCourse.find({ faculty: isFacultyExist._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty'
+    ),
+    query
+  )
+    .filters()
+    .sort()
+    .fields()
+    .paginate()
+
+  const result = await facultyModelQuery.modelQuery
+  const meta = await facultyModelQuery.countTotal()
+
+  return { result, meta }
+}
+
+// get all my course
+const getAllMyEnrolledCourse = async (
+  studentId: string,
+  query: Record<string, unknown>
+) => {
+  // check is student exist
+  const isStudentExist = await Student.findOne({ id: studentId })
+
+  const myEnrolledCourseModelQuery = new QueryBuilder(
+    EnrolledCourse.find({ student: isStudentExist?._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty'
+    ),
+    query
+  )
+    .filters()
+    .sort()
+    .fields()
+    .paginate()
+
+  const result = await myEnrolledCourseModelQuery.modelQuery
+  const meta = await myEnrolledCourseModelQuery.countTotal()
+
+  return { result, meta }
+}
 
 // update enrolled course
 const updateEnrolledCourse = async (
@@ -162,70 +219,70 @@ const updateEnrolledCourse = async (
   // check is semester registration
   const isSemesterRegistration = await SemesterRegistration.findById(
     payload.semesterRegistration
-  );
+  )
   if (!isSemesterRegistration) {
     throw new AppError(
       StatusCodes.NOT_FOUND,
       'Semester registration not founded.'
-    );
+    )
   }
 
   // check is offeredCourse exist
   const isOfferedCourseExist = await OfferedCourse.findById(
     payload.offeredCourse
-  );
+  )
   if (!isOfferedCourseExist) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.');
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not founded.')
   }
 
   // check if student is exist
-  const isStudentExist = await Student.findById(payload.student);
+  const isStudentExist = await Student.findById(payload.student)
   if (!isStudentExist) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'Student not founded.');
+    throw new AppError(StatusCodes.NOT_FOUND, 'Student not founded.')
   }
 
   // get faculty & check if course is belong to the faculty
-  const isFacultyExist = await Faculty.findOne({ id: facultyId });
+  const isFacultyExist = await Faculty.findOne({ id: facultyId })
 
   if (!isFacultyExist) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not founded.');
+    throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not founded.')
   }
   const isCourseBelongToFaculty = await EnrolledCourse.findOne({
     semesterRegistration: isSemesterRegistration._id,
     student: isStudentExist._id,
     offeredCourse: isOfferedCourseExist._id,
     faculty: isFacultyExist._id,
-  });
+  })
 
   if (!isCourseBelongToFaculty) {
     throw new AppError(
       StatusCodes.FORBIDDEN,
       'Your are forbidden for this course.'
-    );
+    )
   }
 
-  const modifiedData: Record<string, unknown> = {};
+  const modifiedData: Record<string, unknown> = {}
 
   if (payload.courseMarks?.finalTerm) {
     const { classTest1, classTest2, midTerm, finalTerm } =
-      isCourseBelongToFaculty.courseMarks;
+      isCourseBelongToFaculty.courseMarks
 
     const totalMarks =
-      Math.ceil(classTest1 * 0.1) +
-      Math.ceil(midTerm * 0.3) +
-      Math.ceil(classTest2 * 0.1) +
-      Math.ceil(finalTerm * 0.5);
+      Math.ceil(classTest1) +
+      Math.ceil(midTerm) +
+      Math.ceil(classTest2) +
+      Math.ceil(finalTerm)
 
-    const result = calculateGradesPoints(totalMarks);
+    const result = calculateGradesPoints(totalMarks)
 
-    modifiedData.grade = result.grade;
-    modifiedData.gradePoint = result.gradePoints;
-    modifiedData.isCompleted = true;
+    modifiedData.grade = result.grade
+    modifiedData.gradePoint = result.gradePoints
+    modifiedData.isCompleted = true
   }
 
   if (payload.courseMarks && Object.keys(payload.courseMarks).length) {
     for (const [key, value] of Object.entries(payload.courseMarks)) {
-      modifiedData[`courseMarks.${key}`] = value;
+      modifiedData[`courseMarks.${key}`] = value
     }
   }
 
@@ -233,13 +290,15 @@ const updateEnrolledCourse = async (
     isCourseBelongToFaculty._id,
     modifiedData,
     { new: true }
-  );
+  )
 
-  return result;
-};
+  return result
+}
 const EnrolledCourseService = {
   createEnrolledCourse,
   updateEnrolledCourse,
-};
+  getAllEnrolledCourses,
+  getAllMyEnrolledCourse,
+}
 
-export default EnrolledCourseService;
+export default EnrolledCourseService

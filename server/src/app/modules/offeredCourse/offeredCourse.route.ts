@@ -20,8 +20,15 @@ router.post(
 // get all offered course : GET
 router.get(
   '/',
-  auth('admin', 'faculty', 'student', 'superAdmin'),
+  auth('admin', 'faculty', 'superAdmin'),
   OfferedCourseController.getAllOfferedCourse
+)
+
+// get my offered course for student : GET
+router.get(
+  '/my-offered-course',
+  auth('student'),
+  OfferedCourseController.getMyOfferedCourse
 )
 
 // get single offered course by Id : GET
