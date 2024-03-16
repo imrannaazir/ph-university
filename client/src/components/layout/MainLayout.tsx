@@ -10,7 +10,7 @@ const { Header, Content } = Layout;
 const MainLayout: React.FC = () => {
   const dispatch = useAppDispatch();
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ height: "100%" }}>
       <Sidebar />
       <Layout>
         <Header>
@@ -22,7 +22,14 @@ const MainLayout: React.FC = () => {
           </Button>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
-          <Outlet />
+          <div
+            style={{
+              padding: 24,
+              minHeight: 360,
+            }}
+          >
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>
