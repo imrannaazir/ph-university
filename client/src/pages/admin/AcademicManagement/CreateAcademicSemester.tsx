@@ -8,9 +8,14 @@ import {
   AcademicSemesterNames,
   months,
 } from "../../../constant/academicManagement.constant";
-import { TSelectOptions } from "../../../types/global.type";
+import { TResponse, TSelectOptions } from "../../../types/global.type";
+import { useCreateAcademicSemesterMutation } from "../../../redux/features/admin/academicManagement/academicSemester/academicSemesterApi";
+import { toast } from "sonner";
+import { TAcademicSemester } from "../../../types/academicManagement";
 
 const CreateAcademicSemester = () => {
+  const [createAcademicSemester] = useCreateAcademicSemesterMutation();
+
   const currentYear = new Date().getFullYear();
   const yearOptions: TSelectOptions = [0, 1, 2, 3, 4].map((item) => {
     const year = (currentYear + item).toString();
@@ -31,14 +36,34 @@ const CreateAcademicSemester = () => {
   }));
 
   // on submit handler
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const toastId = toast.loading("Creating academic semester.", {
+      duration: 2000,
+    });
     const { name, ...restData } = data;
     const formData = {
       ...restData,
-      code: name,
+      semesterCode: name,
       name: AcademicSemesterNames[Number(name - 1)],
     };
-    console.log(formData);
+
+    try {
+      const response = (await createAcademicSemester(
+        formData
+      )) as TResponse<TAcademicSemester>;
+      if (response.error) {
+        toast.error(response.error.data.errorSources[0].message, {
+          id: toastId,
+        });
+      }
+      if (response?.data?.success) {
+        toast.success("Created successfully.", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Something went wrong.", {
+        id: toastId,
+      });
+    }
   };
   return (
     <Flex justify="center" align="center">
