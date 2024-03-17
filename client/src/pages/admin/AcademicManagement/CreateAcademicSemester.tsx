@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { academicSemesterValidationSchema } from "../../../schemas/academicManagement.validation";
 import {
   AcademicSemesterNames,
+  currentYear,
   months,
 } from "../../../constant/academicManagement.constant";
 import { TResponse, TSelectOptions } from "../../../types/global.type";
@@ -16,7 +17,6 @@ import { TAcademicSemester } from "../../../types/academicManagement";
 const CreateAcademicSemester = () => {
   const [createAcademicSemester] = useCreateAcademicSemesterMutation();
 
-  const currentYear = new Date().getFullYear();
   const yearOptions: TSelectOptions = [0, 1, 2, 3, 4].map((item) => {
     const year = (currentYear + item).toString();
     return {

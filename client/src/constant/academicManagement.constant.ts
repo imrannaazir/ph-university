@@ -16,3 +16,5 @@ export const months: TMonth[] = [
 ];
 
 export const AcademicSemesterNames = ["Autumn", "Summer", "Fall"];
+
+export const currentYear = new Date().getFullYear();

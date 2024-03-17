@@ -1,3 +1,5 @@
+import React from "react";
+
 export type TMonth =
   | "January"
   | "February"
@@ -20,4 +22,19 @@ export type TAcademicSemester = {
   year: string;
   startMonth: TMonth;
   endMonth: TMonth;
+  semesterCode?: string;
+  _id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+};
+
+export type TAcademicSemesterTableData = Pick<
+  TAcademicSemester,
+  "name" | "year" | "startMonth" | "endMonth"
+>;
+
+export type TQueryParam = {
+  name: string;
+  value: boolean | React.Key;
 };
