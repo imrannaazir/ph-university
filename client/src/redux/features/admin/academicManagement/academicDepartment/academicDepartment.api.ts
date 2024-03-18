@@ -28,7 +28,7 @@ const academicDepartmentApi = baseApi.injectEndpoints({
 
         return {
           url: `/academic-department`,
-          method: "POST",
+          method: "GET",
           params,
         };
       },

@@ -4,7 +4,7 @@ import { TAcademicFaculty } from "../types";
 const academicFacultyColumns: TableColumnsType<Pick<TAcademicFaculty, "name">> =
   [
     {
-      title: "RowHead",
+      title: "SL",
       dataIndex: "key",
       rowScope: "row",
     },
