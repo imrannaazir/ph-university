@@ -34,6 +34,12 @@ export type TAcademicFaculty = {
   name: string;
   __v?: number;
 };
+export type TAcademicDepartment = {
+  _id?: string;
+  name: string;
+  academicFaculty: any;
+  __v?: number;
+};
 
 export type TAcademicSemesterTableData = Pick<
   TAcademicSemester,

@@ -1,22 +1,23 @@
 import {
-  TAcademicFaculty,
+  TAcademicDepartment,
   TQueryParam,
   TResponseRedux,
 } from "../../../../../types";
 import baseApi from "../../../../api/baseApi";
 
-const academicFacultyApi = baseApi.injectEndpoints({
+const academicDepartmentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // create academic faculty
-    createAcademicFaculty: builder.mutation({
+    // create academic department
+    createAcademicDepartment: builder.mutation({
       query: (data) => ({
-        url: "/academic-faculties",
+        url: `/academic-department`,
         method: "POST",
         body: data,
       }),
     }),
-    // get all academic faculty
-    getAllAcademicFaculty: builder.query({
+
+    // get all department
+    getAllAcademicDepartment: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
         if (args) {
@@ -26,12 +27,12 @@ const academicFacultyApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/academic-faculties`,
-          method: "GET",
+          url: `/academic-department`,
+          method: "POST",
           params,
         };
       },
-      transformResponse: (response: TResponseRedux<TAcademicFaculty[]>) => ({
+      transformResponse: (response: TResponseRedux<TAcademicDepartment[]>) => ({
         data: response.data,
         meta: response.meta,
       }),
@@ -40,6 +41,6 @@ const academicFacultyApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useCreateAcademicFacultyMutation,
-  useGetAllAcademicFacultyQuery,
-} = academicFacultyApi;
+  useCreateAcademicDepartmentMutation,
+  useGetAllAcademicDepartmentQuery,
+} = academicDepartmentApi;

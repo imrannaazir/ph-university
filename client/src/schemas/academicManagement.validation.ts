@@ -17,3 +17,10 @@ export const academicSemesterValidationSchema = z.object({
 export const academicFacultyValidationSchema = z.object({
   name: z.string({ required_error: "Please inter faculty name." }),
 });
+
+export const academicDepartmentValidationSchema = z.object({
+  name: z.string({ required_error: "Please enter department name." }),
+  academicFaculty: z.string({
+    required_error: "Please select academic faculty.",
+  }),
+});
