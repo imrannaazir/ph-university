@@ -14,6 +14,7 @@ const academicSemesterApi = baseApi.injectEndpoints({
         body: data,
         method: "POST",
       }),
+      invalidatesTags: ["academicSemesters"],
     }),
 
     // get all semester
@@ -36,6 +37,7 @@ const academicSemesterApi = baseApi.injectEndpoints({
         data: response.data,
         meta: response.meta,
       }),
+      providesTags: ["academicSemesters"],
     }),
   }),
 });

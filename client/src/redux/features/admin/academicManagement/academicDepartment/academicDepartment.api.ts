@@ -14,6 +14,7 @@ const academicDepartmentApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["academicDepartments"],
     }),
 
     // get all department
@@ -36,6 +37,7 @@ const academicDepartmentApi = baseApi.injectEndpoints({
         data: response.data,
         meta: response.meta,
       }),
+      providesTags: ["academicDepartments"],
     }),
   }),
 });

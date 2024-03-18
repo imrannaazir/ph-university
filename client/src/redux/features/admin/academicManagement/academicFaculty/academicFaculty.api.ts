@@ -14,6 +14,7 @@ const academicFacultyApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["academicFaculties"],
     }),
     // get all academic faculty
     getAllAcademicFaculty: builder.query({
@@ -35,6 +36,7 @@ const academicFacultyApi = baseApi.injectEndpoints({
         data: response.data,
         meta: response.meta,
       }),
+      providesTags: ["academicFaculties"],
     }),
   }),
 });
