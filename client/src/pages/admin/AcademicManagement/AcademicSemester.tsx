@@ -71,6 +71,7 @@ const AcademicSemesterPage: FC = () => {
       />
 
       <Pagination
+        style={{ marginTop: "6px" }}
         current={page}
         onChange={(value) => setPage(value)}
         pageSize={semesterData?.meta?.limit}

@@ -1,4 +1,8 @@
-import { TQueryParam } from "../../../../../types";
+import {
+  TAcademicFaculty,
+  TQueryParam,
+  TResponseRedux,
+} from "../../../../../types";
 import baseApi from "../../../../api/baseApi";
 
 const academicFacultyApi = baseApi.injectEndpoints({
@@ -27,6 +31,12 @@ const academicFacultyApi = baseApi.injectEndpoints({
           params,
         };
       },
+      transformResponse: (
+        response: TResponseRedux<TAcademicFaculty[] | undefined>
+      ) => ({
+        data: response.data,
+        meta: response.meta,
+      }),
     }),
   }),
 });
