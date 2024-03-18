@@ -29,6 +29,12 @@ export type TAcademicSemester = {
   __v?: number;
 };
 
+export type TAcademicFaculty = {
+  _id?: string;
+  name: string;
+  __v?: number;
+};
+
 export type TAcademicSemesterTableData = Pick<
   TAcademicSemester,
   "name" | "year" | "startMonth" | "endMonth"

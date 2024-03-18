@@ -13,3 +13,7 @@ export const academicSemesterValidationSchema = z.object({
   }),
   year: z.string({ required_error: "Please select a year." }),
 });
+
+export const academicFacultyValidationSchema = z.object({
+  name: z.string({ required_error: "Please inter faculty name." }),
+});

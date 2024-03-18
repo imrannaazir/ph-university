@@ -56,7 +56,7 @@ const CreateAcademicSemester = () => {
           id: toastId,
         });
       }
-      if (response?.data?.success) {
+      if (response?.data) {
         toast.success("Created successfully.", { id: toastId });
       }
     } catch (error) {

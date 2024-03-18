@@ -1,9 +1,8 @@
 import { FC, useState } from "react";
-import { Table } from "antd";
+import { Pagination, Table } from "antd";
 import type { TableProps } from "antd";
 import academicSemesterColumns from "../../../dataTableColumns/academicSemester.columns";
 import {
-  TAcademicSemester,
   TAcademicSemesterTableData,
   TQueryParam,
 } from "../../../types/academicManagement";
@@ -11,8 +10,12 @@ import { useGetAllSemestersQuery } from "../../../redux/features/admin/academicM
 
 const AcademicSemesterPage: FC = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
+  const [page, setPage] = useState(1);
 
-  const { data: semesterData, isFetching } = useGetAllSemestersQuery(params);
+  const { data: semesterData, isFetching } = useGetAllSemestersQuery([
+    { name: "page", value: page },
+    ...params,
+  ]);
 
   const onChange: TableProps<TAcademicSemesterTableData>["onChange"] = (
     _pagination,
@@ -47,7 +50,7 @@ const AcademicSemesterPage: FC = () => {
     }
   };
 
-  const data = (semesterData?.data as TAcademicSemester[])?.map(
+  const data = semesterData?.data?.map(
     ({ _id, name, year, startMonth, endMonth }) => ({
       key: _id,
       name,
@@ -58,12 +61,22 @@ const AcademicSemesterPage: FC = () => {
   );
 
   return (
-    <Table
-      loading={isFetching}
-      columns={academicSemesterColumns}
-      dataSource={data}
-      onChange={onChange}
-    />
+    <>
+      <Table
+        pagination={false}
+        loading={isFetching}
+        columns={academicSemesterColumns}
+        dataSource={data}
+        onChange={onChange}
+      />
+
+      <Pagination
+        current={page}
+        onChange={(value) => setPage(value)}
+        pageSize={semesterData?.meta?.limit}
+        total={semesterData?.meta?.total}
+      />
+    </>
   );
 };
 
