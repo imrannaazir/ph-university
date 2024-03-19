@@ -42,3 +42,18 @@ export const createStudentValidationSchema = z.object({
   admissionSemester: z.string(),
   academicDepartment: z.string(),
 });
+
+export const createFacultyValidationSchema = {
+  name: studentNameValidationSchema,
+  gender: z.string(),
+  dateOfBirth: z.string().optional(),
+  bloodGroup: z.enum([...BloodGroups] as [string, ...string[]]),
+  image: z.any(),
+
+  contactNo: z.string(),
+  permanentAddress: z.string(),
+  presentAddress: z.string(),
+
+  designation: z.string(),
+  academicDepartment: z.string(),
+};
