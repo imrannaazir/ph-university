@@ -32,6 +32,7 @@ const createStudent = async (
   }
 
   user.password = password ? password : config.default_password
+  payload.dateOfBirth = new Date(payload.dateOfBirth)
 
   const academicSemester = await AcademicSemester.findById(
     payload.admissionSemester
@@ -82,6 +83,7 @@ const createStudent = async (
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user.')
     }
+
     if (file) {
       //upload image
       const imageName = `${payload.name.firstName}${user.id}`

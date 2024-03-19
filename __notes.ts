@@ -11,6 +11,8 @@
 10. filters  -> redux api -> params -> new URLSearchParams ->append
 11. re structured fitter 
 12 . handle type script error 
+
+______done______
 */
 
 /* 

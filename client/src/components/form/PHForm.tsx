@@ -7,6 +7,7 @@ import {
   useForm,
 } from "react-hook-form";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TFormConfig = { defaultValues?: Record<string, unknown>; resolver?: any };
 
 type TPHFormProps = {
@@ -35,6 +36,8 @@ const PHForm: FC<TPHFormProps> = ({
     onSubmit(data);
     methods.reset();
   };
+
+  console.log(methods.watch("dateOfBirth")?.toString());
 
   return (
     <FormProvider {...methods}>

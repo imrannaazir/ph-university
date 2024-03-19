@@ -1,12 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
-import catchAsync from '../utils/catchAsync';
-import { TUserRole } from '../modules/user/user.interface';
-import AppError from '../errors/AppError';
-import { StatusCodes } from 'http-status-codes';
-import { JwtPayload } from 'jsonwebtoken';
-import config from '../config';
-import User from '../modules/user/user.model';
-import { verifyToken } from '../modules/auth/auth.utils';
+import { NextFunction, Request, Response } from 'express'
+import catchAsync from '../utils/catchAsync'
+import { TUserRole } from '../modules/user/user.interface'
+import AppError from '../errors/AppError'
+import { StatusCodes } from 'http-status-codes'
+import { JwtPayload } from 'jsonwebtoken'
+import config from '../config'
+import User from '../modules/user/user.model'
+import { verifyToken } from '../modules/auth/auth.utils'
 
 const auth = (...requiredRoles: TUserRole[]) => {
   /* 
@@ -20,32 +20,32 @@ const auth = (...requiredRoles: TUserRole[]) => {
     */
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check token is available
-    const token = req.headers.authorization;
+    const token = req.headers.authorization
 
     if (!token) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'Access token is not sent.');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'Access token is not sent.')
     }
 
     // check token is valid
     const decoded = (await verifyToken(
       token,
       config.jwt_access_secret as string
-    )) as JwtPayload;
+    )) as JwtPayload
 
     // check user is exist
-    const isUserExist = await User.findOne({ id: decoded.id });
+    const isUserExist = await User.findOne({ id: decoded.id })
     if (!isUserExist) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'User not found.');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User not found.')
     }
 
     // check user is deleted
     if (isUserExist.isDeleted) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is deleted.');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is deleted.')
     }
 
     //check user is blocked
     if (isUserExist.status === 'blocked') {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is blocked');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is blocked')
     }
 
     // check if jwt issued before password changed
@@ -56,18 +56,18 @@ const auth = (...requiredRoles: TUserRole[]) => {
         decoded.iat as number
       ))
     ) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'User has not access.');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User has not access.')
     }
 
     // check user role is authorized
     if (requiredRoles && !requiredRoles.includes(decoded.role)) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is not authorized.');
+      throw new AppError(StatusCodes.UNAUTHORIZED, 'User is not authorized.')
     }
 
-    req.user = decoded as JwtPayload;
+    req.user = decoded as JwtPayload
 
-    next();
-  });
-};
+    next()
+  })
+}
 
-export default auth;
+export default auth

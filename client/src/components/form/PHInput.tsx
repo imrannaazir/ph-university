@@ -1,4 +1,4 @@
-import { Input } from "antd";
+import { Form, Input } from "antd";
 import { FC, HTMLInputTypeAttribute } from "react";
 import { Controller } from "react-hook-form";
 
@@ -14,8 +14,9 @@ const PHInput: FC<TPHInputProps> = ({ type, label, name }) => {
       name={name}
       render={({ field, fieldState: { error } }) => (
         <div style={{ marginBottom: "10px" }}>
-          {label && <p style={{ marginBottom: "5px" }}>{label}</p>}
-          <Input {...field} type={type} id={name} />
+          <Form.Item label={label}>
+            <Input {...field} type={type} id={name} />
+          </Form.Item>
           {error && <small style={{ color: "red" }}>{error.message}</small>}
         </div>
       )}
