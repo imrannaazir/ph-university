@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BloodGroups, FacultyGender } from '../faculty/faculty.constant'
 
 //validation schema for creating
 export const studentNameValidationSchema = z.object({
@@ -29,7 +30,8 @@ export const createStudentValidationSchema = z.object({
     student: z.object({
       name: studentNameValidationSchema,
       email: z.string().email(),
-      gender: z.enum(['Male', 'Female', 'Other']),
+      gender: z.enum(FacultyGender as [string, ...string[]]),
+      bloodGroup: z.enum([...BloodGroups] as [string, ...string[]]),
       dateOfBirth: z.string(),
       contactNo: z.string(),
       emergencyContact: z.string(),

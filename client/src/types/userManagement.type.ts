@@ -25,6 +25,7 @@ export interface TStudent {
   email: string;
   gender: string;
   dateOfBirth: string;
+  bloodGroup: string;
 
   contactNo: string;
   emergencyContact: string;

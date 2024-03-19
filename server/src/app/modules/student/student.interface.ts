@@ -1,4 +1,5 @@
 import { Types } from 'mongoose'
+import { TBloodGroup } from '../faculty/faculty.interface'
 
 export type TStudentName = {
   firstName: string
@@ -28,6 +29,7 @@ export type TStudent = {
   name: TStudentName
   email: string
   gender: 'Male' | 'Female' | 'Other'
+  bloodGroup: TBloodGroup
   dateOfBirth: Date
   contactNo: string
   emergencyContact?: string

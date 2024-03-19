@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Gender } from "../constant/userManagement.constant";
+import { BloodGroups, Gender } from "../constant/userManagement.constant";
 
 //validation schema for creating
 export const studentNameValidationSchema = z.object({
@@ -29,6 +29,7 @@ export const createStudentValidationSchema = z.object({
   email: z.string().email(),
   gender: z.enum(Gender),
   dateOfBirth: z.string(),
+  bloodGroup: z.enum(BloodGroups as [string, ...string[]]),
   image: z.any().optional(),
 
   contactNo: z.string(),

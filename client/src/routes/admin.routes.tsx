@@ -9,6 +9,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import CreateAdmin from "../pages/admin/AcademicManagement/CreateAdmin";
 import CreateStudent from "../pages/admin/UserManagement/CreateStudent";
 import { TPath } from "../types";
+import CreateFaculty from "../pages/admin/UserManagement/CreateFaculty";
 
 export const adminPaths: TPath[] = [
   {
@@ -55,14 +56,19 @@ export const adminPaths: TPath[] = [
     name: "User Management",
     children: [
       {
-        name: "Create Admin",
-        path: "create-admin",
-        element: <CreateAdmin />,
-      },
-      {
         name: "Create Student",
         path: "create-student",
         element: <CreateStudent />,
+      },
+      {
+        name: "Create Faculty",
+        path: "create-faculty",
+        element: <CreateFaculty />,
+      },
+      {
+        name: "Create Admin",
+        path: "create-admin",
+        element: <CreateAdmin />,
       },
     ],
   },

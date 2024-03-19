@@ -5,6 +5,7 @@ import {
   TStudent,
   TStudentName,
 } from './student.interface'
+import { BloodGroups } from '../faculty/faculty.constant'
 
 const studentNameSchema = new Schema<TStudentName>({
   firstName: {
@@ -97,6 +98,11 @@ const studentSchema = new Schema<TStudent>(
       type: String,
       enum: ['Male', 'Female', 'Other'],
       required: [true, 'Gender is required'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: BloodGroups,
+      required: true,
     },
     dateOfBirth: {
       type: Date,

@@ -37,8 +37,6 @@ const PHForm: FC<TPHFormProps> = ({
     methods.reset();
   };
 
-  console.log(methods.watch("dateOfBirth")?.toString());
-
   return (
     <FormProvider {...methods}>
       <Form layout="vertical" onFinish={methods.handleSubmit(handleSubmit)}>

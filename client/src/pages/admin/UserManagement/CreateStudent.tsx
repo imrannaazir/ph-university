@@ -5,7 +5,10 @@ import { Controller, FieldValues, SubmitHandler } from "react-hook-form";
 import { createStudentValidationSchema } from "../../../schemas/userManagement.validation";
 import PHInput from "../../../components/form/PHInput";
 import PHSelect from "../../../components/form/PHSelect";
-import { genderOptions } from "../../../constant/userManagement.constant";
+import {
+  bloodGroupOptions,
+  genderOptions,
+} from "../../../constant/userManagement.constant";
 import PHDatePicker from "../../../components/form/PHDatePicker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -60,39 +63,11 @@ const CreateStudent = () => {
     label: `${item.name} - ${item.year}`,
     value: item._id,
   })) as TSelectOptions;
-  const defaultValues = {
-    name: {
-      firstName: "John",
-      middleName: "Doe",
-      lastName: "Smith",
-    },
-    email: "a12247@gmail.com",
-    gender: "Male",
-    contactNo: "1234567890",
-    emergencyContact: "9876543210",
-    presentAddress: "123 Main St, Cityville",
-    permanentAddress: "456 Park Ave, Townsville",
-    guardian: {
-      fatherName: "John Doe Sr.",
-      fatherOccupation: "Engineer",
-      fatherContactNo: "1234567890",
-      motherName: "Jane Doe",
-      motherOccupation: "Doctor",
-      motherContactNo: "9876543210",
-    },
-    localGuardian: {
-      name: "Local Guardian",
-      occupation: "Business",
-      contactNo: "5555555555",
-      address: "789 Side St, Villagetown",
-    },
-  };
 
   return (
     <Row justify={"center"}>
       <Col span={24}>
         <PHForm
-          defaultValues={defaultValues}
           onSubmit={onSubmit}
           resolver={zodResolver(createStudentValidationSchema)}
         >
@@ -129,6 +104,13 @@ const CreateStudent = () => {
             </Col>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect label="Gender" name="gender" options={genderOptions} />
+            </Col>
+            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+              <PHSelect
+                label="Blood Group"
+                name="bloodGroup"
+                options={bloodGroupOptions}
+              />
             </Col>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHDatePicker label="Date of Birth" name="dateOfBirth" />
