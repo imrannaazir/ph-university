@@ -43,7 +43,7 @@ export const createStudentValidationSchema = z.object({
   academicDepartment: z.string(),
 });
 
-export const createFacultyValidationSchema = {
+export const createFacultyValidationSchema = z.object({
   name: studentNameValidationSchema,
   gender: z.string(),
   dateOfBirth: z.string().optional(),
@@ -56,4 +56,5 @@ export const createFacultyValidationSchema = {
 
   designation: z.string(),
   academicDepartment: z.string(),
-};
+  academicFaculty: z.string(),
+});

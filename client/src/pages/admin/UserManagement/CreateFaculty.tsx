@@ -13,17 +13,26 @@ import PHDatePicker from "../../../components/form/PHDatePicker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { TResponse, TSelectOptions } from "../../../types";
-import { TStudent } from "../../../types/userManagement.type";
+import { TFaculty } from "../../../types/userManagement.type";
 import { useGetAllAcademicDepartmentQuery } from "../../../redux/features/admin/academicManagement/academicDepartment/academicDepartment.api";
-import { useCreateAcademicFacultyMutation } from "../../../redux/features/admin/academicManagement/academicFaculty/academicFaculty.api";
 import { createFacultyValidationSchema } from "../../../schemas/userManagement.validation";
+import { useCreateFacultyMutation } from "../../../redux/features/admin/userManagement/faculty/faculty.api";
+import { useGetAllAcademicFacultyQuery } from "../../../redux/features/admin/academicManagement/academicFaculty/academicFaculty.api";
+import { useState } from "react";
+import PHSelectWithWatch from "../../../components/form/PHSelectWithWatch";
 
 const CreateFaculty = () => {
+  const [selectedAcademicFaculty, setSelectedAcademicFaculty] = useState("");
   // rtk query apis
+  const { data: academicFacultyData, isFetching: isAcademicFacultyFetching } =
+    useGetAllAcademicFacultyQuery(undefined);
   const { data: academicDepartmentData, isFetching: isDepartmentFetching } =
-    useGetAllAcademicDepartmentQuery(undefined);
+    useGetAllAcademicDepartmentQuery(
+      [{ name: "academicFaculty", value: selectedAcademicFaculty }],
+      { skip: isAcademicFacultyFetching || !selectedAcademicFaculty }
+    );
 
-  const [CreateFaculty] = useCreateAcademicFacultyMutation();
+  const [CreateFaculty] = useCreateFacultyMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async ({ image, ...data }) => {
     const toastId = toast.loading("Creating", {
@@ -31,11 +40,11 @@ const CreateFaculty = () => {
     });
 
     const formData = new FormData();
-    formData.append("data", JSON.stringify({ student: data }));
+    formData.append("data", JSON.stringify({ faculty: data }));
     formData.append("file", image);
 
     try {
-      const response = (await CreateFaculty(formData)) as TResponse<TStudent>;
+      const response = (await CreateFaculty(formData)) as TResponse<TFaculty>;
 
       if (response.error) {
         toast.error(response.error.data.errorSources[0].message, {
@@ -53,6 +62,11 @@ const CreateFaculty = () => {
 
   // options for select input
   const departmentOptions = academicDepartmentData?.data?.map((item) => ({
+    label: item.name,
+    value: item._id,
+  })) as TSelectOptions;
+
+  const academicFacultyOptions = academicFacultyData?.data?.map((item) => ({
     label: item.name,
     value: item._id,
   })) as TSelectOptions;
@@ -135,13 +149,27 @@ const CreateFaculty = () => {
 
           <Row gutter={8}>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+              <PHSelectWithWatch
+                name="academicFaculty"
+                label="Academic Faculty"
+                options={academicFacultyOptions}
+                disabled={isAcademicFacultyFetching}
+                onValueChange={setSelectedAcademicFaculty}
+              />
+            </Col>
+            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect
                 name="academicDepartment"
                 label="Academic Department"
                 options={departmentOptions}
-                disabled={isDepartmentFetching}
+                disabled={
+                  isDepartmentFetching ||
+                  isAcademicFacultyFetching ||
+                  !selectedAcademicFaculty
+                }
               />
             </Col>
+
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect
                 name="designation"

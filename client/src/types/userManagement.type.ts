@@ -37,3 +37,20 @@ export interface TStudent {
   admissionSemester: string;
   academicDepartment: string;
 }
+
+export type TFaculty = {
+  id: string;
+  name: TName;
+  designation: string;
+  gender: string;
+  email: string;
+  dateOfBirth: string;
+  contactNo: string;
+  bloodGroup: string;
+  presentAddress: string;
+  permanentAddress: string;
+  profileImage?: string;
+  isDeleted?: boolean;
+  academicDepartment: string;
+  academicFaculty: string;
+};
